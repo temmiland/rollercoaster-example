@@ -9,12 +9,12 @@
     ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
     ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
     ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
-    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
-    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
-    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
-    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "plateau", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
-    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
-    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
+    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "plateau", "plateau", "plateau", "plateau", "plateau", "lightGrass", "grass", "lightGrass"],
+    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "plateau", "plateau", "plateau", "plateau", "plateau", "grass", "lightGrass", "grass"],
+    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "plateau", "plateau", "plateau", "plateau", "plateau", "lightGrass", "grass", "lightGrass"],
+    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "plateau", "plateau", "plateau", "plateau", "plateau", "grass", "lightGrass", "grass"],
+    ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "plateau", "plateau", "plateau", "plateau", "plateau", "lightGrass", "grass", "lightGrass"],
+    ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "ramp", "grass", "lightGrass", "grass", "lightGrass", "grass"],
     ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
     ["lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "path", "path", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass"],
     ["grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "path", "path", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass", "grass", "lightGrass"],
@@ -35,12 +35,12 @@
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -83,6 +83,10 @@
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ]
   },
-  "props": [{ "model": "house", "x": 8, "y": 10, "elevation": 0, "rot": 0 }],
-  "entities": [{ "type": "player", "sprite": "player", "x": 12, "y": 14 }]
+  "props": [
+    {"model": "house", "x": 8, "y": 10, "elevation": 0, "rot": 0}
+  ],
+  "entities": [
+    {"type": "player", "sprite": "player", "x": 12, "y": 14}
+  ]
 }
