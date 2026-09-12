@@ -21,6 +21,9 @@ import land.temmi.rollercoaster.render.PixelCamera;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
 import land.temmi.rollercoaster.render.BillboardQuad;
 import land.temmi.rollercoaster.render.BillboardRenderer;
+import land.temmi.rollercoaster.render.DayNightCycle;
+import land.temmi.rollercoaster.render.LightingEnvironment;
+import land.temmi.rollercoaster.render.PointLightSource;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
 import land.temmi.rollercoaster.world.WorldScene;
@@ -42,6 +45,9 @@ public class ExampleGame extends ApplicationAdapter {
     private final Matrix4 overlayProjection = new Matrix4();
 
     private ModelBatch modelBatch;
+    private LightingEnvironment lighting;
+    private DayNightCycle dayNightCycle;
+    private PointLightSource houseLight;
     private WorldScene worldScene;
     private final Array<ModelInstance> visibleInstances = new Array<>();
     private Texture spriteTexture;
@@ -65,7 +71,11 @@ public class ExampleGame extends ApplicationAdapter {
         debugFont = new BitmapFont();
         shapes = new ShapeRenderer();
 
-        modelBatch = new ModelBatch(new WorldShaderProvider());
+        lighting = new LightingEnvironment();
+        dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f);
+        houseLight = new PointLightSource(8f, 1.5f, 9f, new Color(1f, 0.45f, 0.12f, 1f), 2.2f, 5f);
+        lighting.addPointLight(houseLight);
+        modelBatch = new ModelBatch(new WorldShaderProvider(lighting));
         worldScene = ExampleMap.createScene();
         LoadedMap map = worldScene.getMap();
 
@@ -105,6 +115,12 @@ public class ExampleGame extends ApplicationAdapter {
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) debugVisible = !debugVisible;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) houseLight.enabled = !houseLight.enabled;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) dayNightCycle.setPaused(!dayNightCycle.isPaused());
+        if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+            dayNightCycle.setTimeOfDay((dayNightCycle.getTimeOfDay() + 1f) % 24f);
+        }
+        dayNightCycle.update(delta);
         player.update(delta, input.pollMove());
         playerAnimation.setPlaying(player.isMoving());
         playerAnimation.update(delta);
@@ -179,6 +195,8 @@ public class ExampleGame extends ApplicationAdapter {
             + "  tile " + player.getTileX() + "," + player.getTileZ()
             + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
             + "," + subjectFootPosition.z + "\n"
+            + "time " + String.format(java.util.Locale.ROOT, "%.1fh", dayNightCycle.getTimeOfDay())
+            + "  lamp " + (houseLight.enabled ? "on" : "off") + "\n"
             + "camera fov " + pixelCamera.getFovDegrees()
             + " pitch " + pixelCamera.getPitchDegrees()
             + " distance " + pixelCamera.getDistance();
