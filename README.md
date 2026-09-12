@@ -13,6 +13,8 @@ The build uses the sibling Rollercoaster repository through `includeBuild('../ro
 
 Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android` und `platforms/ios`.
 
-Im Desktoplauf zeigt `example-game` den Tag-/Nachtzyklus. `N` springt eine Stunde weiter,
-`Space` pausiert die Uhr und `L` aktiviert/deaktiviert die automatische Haus- und Straßenbeleuchtung.
-Tagsüber sind Lampen und Fensterlicht aus. Details und Bildtests stehen in [docs/lighting.md](docs/lighting.md).
+Im Desktoplauf zeigt `example-game` vier feste Lichtsituationen. `K` schaltet sie sofort durch.
+Die Uhr läuft im Hintergrund weiter; beim nächsten Kartenbetreten wird die Situation anhand der
+Uhrzeit übernommen. `N` springt eine Stunde weiter, `Space` pausiert die Uhr und `L`
+aktiviert/deaktiviert die automatische Haus- und Straßenbeleuchtung. Details und Bildtests stehen
+in [docs/lighting.md](docs/lighting.md).
