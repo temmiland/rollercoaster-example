@@ -8,5 +8,32 @@ java {
 }
 
 dependencies {
-    api project(':rollercoaster')
+    api 'land.temmi:rollercoaster:0.1.0'
+}
+
+sourceSets {
+    renderTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    renderTestImplementation.extendsFrom implementation
+    renderTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+dependencies {
+    renderTestImplementation libs.gdx.backend.lwjgl3
+    renderTestImplementation "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-desktop"
+}
+
+tasks.register('renderSmokeTest', JavaExec) {
+    group = 'verification'
+    description = 'Checks the example world in a desktop OpenGL context.'
+    classpath = sourceSets.renderTest.runtimeClasspath
+    mainClass = 'land.temmi.trackside.lwjgl3.RenderSmokeTest'
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+        jvmArgs += ['-XstartOnFirstThread']
+    }
 }

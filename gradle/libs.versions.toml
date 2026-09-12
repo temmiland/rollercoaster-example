@@ -1,0 +1,30 @@
+[versions]
+gdx = "1.14.2"
+gltf = "2.3.0"
+robovm = "2.3.26"
+kotlin = "2.4.20"
+agp = "9.4.0"
+
+# Launcher modules never ship to iOS, so they may use a modern language level.
+# rollercoaster and game are pinned to 8 — see the plan for why.
+javaShared = "8"
+javaLauncher = "21"
+
+[libraries]
+gdx-core = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
+gdx-gltf = { module = "com.github.mgsx-dev.gdx-gltf:gltf", version.ref = "gltf" }
+
+# Desktop — gdx-platform natives are classifier-only, added directly in lwjgl3/build.gradle
+gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
+
+# Android
+gdx-backend-android = { module = "com.badlogicgames.gdx:gdx-backend-android", version.ref = "gdx" }
+
+# iOS — MetalANGLE, not the plain GL backend. Apple deprecated GL and caps it at 60fps.
+gdx-backend-robovm = { module = "com.badlogicgames.gdx:gdx-backend-robovm-metalangle", version.ref = "gdx" }
+robovm-rt = { module = "com.mobidevelop.robovm:robovm-rt", version.ref = "robovm" }
+robovm-cocoatouch = { module = "com.mobidevelop.robovm:robovm-cocoatouch", version.ref = "robovm" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+android-app = { id = "com.android.application", version.ref = "agp" }
