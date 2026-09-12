@@ -8,12 +8,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import land.temmi.rollercoaster.render.LowResTarget;
 import land.temmi.rollercoaster.render.PixelCamera;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
@@ -40,6 +42,7 @@ public class ExampleGame extends ApplicationAdapter {
 
     private ModelBatch modelBatch;
     private WorldScene worldScene;
+    private final Array<ModelInstance> visibleInstances = new Array<>();
     private Texture spriteTexture;
     private BillboardRenderer playerSprite;
     private GridActor player;
@@ -108,7 +111,7 @@ public class ExampleGame extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(pixelCamera.camera);
-        modelBatch.render(worldScene.getInstances());
+        modelBatch.render(worldScene.getVisibleInstances(pixelCamera.camera, visibleInstances));
         modelBatch.render(playerSprite);
         modelBatch.end();
 
