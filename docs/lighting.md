@@ -14,7 +14,8 @@ is entered, so crossing a threshold does not change the current map in the middl
 
 The schedule is early morning from 05:00, day from 08:00, early evening from 17:00,
 and night from 20:00 until 05:00. Local lights and window emission are off during the day
-and use a fixed intensity in the other three situations, unless disabled with `L`. Sun shadows disappear at night. Local lights do not yet cast
+and use a reduced fixed intensity in the other three situations, unless disabled with `L`.
+Night uses brighter cool ambient light and weak moonlight, so the scene remains visible. Local lights do not yet cast
 their own shadows; see the engine's `docs/lighting.md` for the current render contract.
 
 `./gradlew :lightingSmokeTest --offline` checks measured lighting and saves
