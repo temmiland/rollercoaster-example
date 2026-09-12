@@ -76,7 +76,7 @@ public class ExampleGame extends ApplicationAdapter {
 
         lighting = new LightingEnvironment();
         dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f);
-        shadowMap = new DirectionalShadowMap(lighting).setWorldSize(40f);
+        shadowMap = new DirectionalShadowMap(lighting).setWorldSize(32f);
         modelBatch = new ModelBatch(new WorldShaderProvider(lighting, shadowMap));
         worldScene = ExampleMap.createScene();
         exampleLighting = new ExampleLighting(lighting, worldScene);
