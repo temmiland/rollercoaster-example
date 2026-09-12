@@ -17,7 +17,8 @@ and night from 20:00 until 05:00. Early morning is red, day is close to neutral,
 evening mixes sunset red with blue ambient light. Local lights and window emission are off during the day
 and use a reduced fixed intensity in the other three situations, unless disabled with `L`.
 Window geometry keeps its blue daytime colour and receives the same amber tint as its glow when
-the local lights are active.
+the local lights are active. The visible emission is boosted separately from the point-light
+intensity, so the glow is stronger without increasing its illuminated radius.
 Night uses brighter cool ambient light and weak moonlight, so the scene remains visible. Local lights do not yet cast
 their own shadows; see the engine's `docs/lighting.md` for the current render contract.
 

@@ -109,7 +109,10 @@ final class LightingChecks {
                 for (ModelInstance instance : scene.getInstances()) for (Material material : instance.materials) {
                     if (!"windows".equals(material.id)) continue;
                     ColorAttribute glow = (ColorAttribute) material.get(ColorAttribute.Emissive);
-                    if (glow == null || (glow.color.r > 0) != active) throw new AssertionError("Window emission at wrong time: " + hours[i]);
+                    if (glow == null || (glow.color.r > 0) != active
+                        || (active && glow.color.r < 0.5f)) {
+                        throw new AssertionError("Window emission at wrong time: " + hours[i]);
+                    }
                     ColorAttribute diffuse = (ColorAttribute) material.get(ColorAttribute.Diffuse);
                     if (diffuse == null || (diffuse.color.b < diffuse.color.g) != active) {
                         throw new AssertionError("Window diffuse tint at wrong time: " + hours[i]);

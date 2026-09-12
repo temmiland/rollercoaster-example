@@ -19,6 +19,7 @@ import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 /** Window emission and street lamps placed in the example scene. */
 public final class ExampleLighting implements Disposable {
+    private static final float EMISSION_BOOST = 2f;
     final Array<ModelInstance> instances = new Array<>();
     private final Array<Model> models = new Array<>();
     private final Array<PointLightSource> lights = new Array<>();
@@ -96,7 +97,9 @@ public final class ExampleLighting implements Disposable {
             lights.get(i).enabled = enabled && localFactor > 0f;
             lights.get(i).intensity = intensities.get(i) * localFactor;
         }
-        for (ColorAttribute glow : emission) glow.color.set(warm).mul(enabled ? localFactor : 0f);
+        // Boost only the material emission. Point-light intensities stay on the original
+        // localFactor so the illuminated ground and radius do not get brighter.
+        for (ColorAttribute glow : emission) glow.color.set(warm).mul(enabled ? localFactor * EMISSION_BOOST : 0f);
         boolean windowsLit = enabled && localFactor > 0f;
         for (int i = 0; i < windowBaseColors.size; i++) {
             windowBaseColors.get(i).color.set(windowsLit ? warm : originalWindowBaseColors.get(i));
