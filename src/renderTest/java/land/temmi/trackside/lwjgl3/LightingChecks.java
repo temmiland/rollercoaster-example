@@ -110,6 +110,10 @@ final class LightingChecks {
                     if (!"windows".equals(material.id)) continue;
                     ColorAttribute glow = (ColorAttribute) material.get(ColorAttribute.Emissive);
                     if (glow == null || (glow.color.r > 0) != active) throw new AssertionError("Window emission at wrong time: " + hours[i]);
+                    ColorAttribute diffuse = (ColorAttribute) material.get(ColorAttribute.Diffuse);
+                    if (diffuse == null || (diffuse.color.b < diffuse.color.g) != active) {
+                        throw new AssertionError("Window diffuse tint at wrong time: " + hours[i]);
+                    }
                 }
             }
             demo.toggle(); clock.setTimeOfDay(22).enterMap(); demo.update(clock.getSituation());

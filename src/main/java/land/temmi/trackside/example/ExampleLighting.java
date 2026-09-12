@@ -15,6 +15,7 @@ import land.temmi.rollercoaster.render.LightingEnvironment;
 import land.temmi.rollercoaster.render.PointLightSource;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.world.TerrainSurface;
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 /** Window emission and street lamps placed in the example scene. */
 public final class ExampleLighting implements Disposable {
@@ -22,6 +23,8 @@ public final class ExampleLighting implements Disposable {
     private final Array<Model> models = new Array<>();
     private final Array<PointLightSource> lights = new Array<>();
     private final Array<ColorAttribute> emission = new Array<>();
+    private final Array<ColorAttribute> windowBaseColors = new Array<>();
+    private final Array<Color> originalWindowBaseColors = new Array<>();
     private final LightingEnvironment environment;
     /** Shared amber tone for window emission, bulbs, and their local light. */
     private final Color warm = new Color(1f, 0.62f, 0.28f, 1f);
@@ -35,6 +38,14 @@ public final class ExampleLighting implements Disposable {
             for (Material material : instance.materials) {
                 if (!"windows".equals(material.id)) continue;
                 emission.add((ColorAttribute) material.get(ColorAttribute.Emissive));
+                ColorAttribute baseColor = (ColorAttribute) material.get(PBRColorAttribute.BaseColorFactor);
+                if (baseColor == null) baseColor = (ColorAttribute) material.get(ColorAttribute.Diffuse);
+                if (baseColor == null) {
+                    baseColor = ColorAttribute.createDiffuse(Color.WHITE);
+                    material.set(baseColor);
+                }
+                windowBaseColors.add(baseColor);
+                originalWindowBaseColors.add(new Color(baseColor.color));
                 window(instance, -0.7f);
                 window(instance, 1.7f);
             }
@@ -86,6 +97,10 @@ public final class ExampleLighting implements Disposable {
             lights.get(i).intensity = intensities.get(i) * localFactor;
         }
         for (ColorAttribute glow : emission) glow.color.set(warm).mul(enabled ? localFactor : 0f);
+        boolean windowsLit = enabled && localFactor > 0f;
+        for (int i = 0; i < windowBaseColors.size; i++) {
+            windowBaseColors.get(i).color.set(windowsLit ? warm : originalWindowBaseColors.get(i));
+        }
     }
 
     boolean isEnabled() { return lights.size > 0 && lights.first().enabled; }
