@@ -46,7 +46,7 @@ public final class ExampleLighting implements Disposable {
     private void window(ModelInstance house, float x) {
         Vector3 position = new Vector3(x, 1.65f, 2.12f).mul(house.transform);
         Vector3 direction = new Vector3(0f, -0.5f, 1f).rot(house.transform).nor();
-        add(new PointLightSource(position.x, position.y, position.z, warm, 0.8f, 4.5f)
+        add(new PointLightSource(position.x, position.y, position.z, warm, 0.45f, 4.5f)
             .setSpot(direction, 75f, 145f));
     }
 
@@ -62,7 +62,7 @@ public final class ExampleLighting implements Disposable {
         ModelInstance fixture = new ModelInstance(bulb, x, y + 2.75f, z);
         instances.add(fixture);
         emission.add((ColorAttribute) fixture.materials.first().get(ColorAttribute.Emissive));
-        add(new PointLightSource(x, y + 2.7f, z, warm, 1.25f, 7f));
+        add(new PointLightSource(x, y + 2.7f, z, warm, 0.70f, 7f));
     }
 
     private void add(PointLightSource light) {
