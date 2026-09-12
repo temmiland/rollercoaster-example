@@ -29,7 +29,8 @@ import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.MapLoader;
 import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
-import land.temmi.rollercoaster.world.TilePrototype;
+import land.temmi.rollercoaster.world.TileShape;
+import land.temmi.rollercoaster.world.TileSurface;
 import land.temmi.rollercoaster.world.Tileset;
 
 /** Desktop GL integration check; run with :lwjgl3:renderSmokeTest. */
@@ -63,10 +64,10 @@ public final class RenderSmokeTest extends ExampleGame {
     }
 
     private void verifyMapDocument() {
-        TilePrototype placeholder = new TilePrototype(null);
-        Tileset tileset = new Tileset().add("grass", placeholder).add("lightGrass", placeholder)
-            .add("path", placeholder).add("plateau", placeholder).add("ramp", placeholder)
-            .add("house", placeholder);
+        Tileset tileset = new Tileset();
+        for (String id : new String[]{"grass", "lightGrass", "path", "plateau", "ramp", "rampBlocked"}) {
+            tileset.add(new TileSurface(id));
+        }
         land.temmi.rollercoaster.world.LoadedMap map = new MapLoader().load(
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
@@ -81,16 +82,30 @@ public final class RenderSmokeTest extends ExampleGame {
             || map.tiles.getHeight(18, 8) != 1f || map.tiles.getHeight(17, 9) != 0f) {
             throw new AssertionError("Ramp does not bridge flat ground and the plateau");
         }
+        if (map.tiles.getShape(18, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(16, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(18, 10) != TileShape.FLAT) {
+            throw new AssertionError("Shape layer did not load");
+        }
     }
 
     /** Walks the actor up the ramp and checks the cliff beside it stays closed. */
     private void verifyTerrainSteps() {
-        GridActor.TileAccess access = new TerrainRules(ExampleMap.getLoadedMap().tiles);
+        land.temmi.rollercoaster.world.TileMap tiles = ExampleMap.getLoadedMap().tiles;
+        // Walkability rides on the tile type, shape on the map - the two ramps share a shape
+        // and differ only in which tile type they use.
+        if (tiles.isWalkable(16, 9) || !tiles.isWalkable(18, 9)) {
+            throw new AssertionError("Ramp walkability does not come from the tile type");
+        }
+        GridActor.TileAccess access = new TerrainRules(tiles);
         if (!climbs(access, 18, 10) || !climbs(access, 18, 9)) {
             throw new AssertionError("Actor cannot walk up the ramp");
         }
         if (climbs(access, 17, 9) || climbs(access, 19, 9)) {
             throw new AssertionError("Actor can climb the cliff instead of using the ramp");
+        }
+        if (climbs(access, 16, 10)) {
+            throw new AssertionError("Actor can step onto a ramp that is scenery only");
         }
         GridActor actor = actorAt(access, 18, 10);
         actor.update(0f, MoveIntent.UP);
