@@ -31,7 +31,9 @@ import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
 import land.temmi.rollercoaster.input.InputSource;
+import land.temmi.rollercoaster.input.CombinedInput;
 import land.temmi.rollercoaster.input.KeyboardInput;
+import land.temmi.rollercoaster.input.TouchInput;
 
 public class ExampleGame extends ApplicationAdapter {
 
@@ -89,7 +91,7 @@ public class ExampleGame extends ApplicationAdapter {
         MapEntity playerEntity = findPlayer(map);
         player.setTileAccess(new TerrainRules(map.tiles));
         player.setTile(playerEntity.x, playerEntity.z);
-        input = new KeyboardInput();
+        input = new CombinedInput(new KeyboardInput(), new TouchInput());
     }
 
     private void createPlayerSprite() {

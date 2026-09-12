@@ -15,6 +15,7 @@ import land.temmi.rollercoaster.world.MapLoader;
 import land.temmi.rollercoaster.world.TileSurface;
 import land.temmi.rollercoaster.world.Tileset;
 import land.temmi.rollercoaster.world.WorldScene;
+import land.temmi.rollercoaster.world.WorldSceneLoader;
 
 /**
  * Example world: a path cross, a plateau reached by a walkable ramp, a ramp that is scenery only,
@@ -29,7 +30,13 @@ public final class ExampleMap {
     private ExampleMap() { }
 
     public static Array<Model> create() {
-        Tileset tileset = new Tileset()
+        Tileset tileset = createTileset();
+        loadedMap = new MapLoader().load(Gdx.files.classpath("maps/testfield.json"), tileset);
+        return new ChunkMesher().build(loadedMap.tiles, new Material());
+    }
+
+    private static Tileset createTileset() {
+        return new Tileset()
             .add(tile("grass", new Color(0.34f, 0.58f, 0.25f, 1f)))
             .add(tile("lightGrass", new Color(0.38f, 0.63f, 0.28f, 1f)))
             .add(tile("path", new Color(0.76f, 0.65f, 0.43f, 1f)))
@@ -37,8 +44,6 @@ public final class ExampleMap {
             .add(tile("ramp", new Color(0.70f, 0.60f, 0.40f, 1f)))
             // Same slope, but no actor may step onto it.
             .add(tile("rampBlocked", new Color(0.46f, 0.44f, 0.42f, 1f)).setWalkable(false));
-        loadedMap = new MapLoader().load(Gdx.files.classpath("maps/testfield.json"), tileset);
-        return new ChunkMesher().build(loadedMap.tiles, new Material());
     }
 
     private static TileSurface tile(String id, Color color) {
@@ -47,8 +52,10 @@ public final class ExampleMap {
 
     /** The scene derives prop collision and owns the chunk models; the catalog stays here. */
     public static WorldScene createScene() {
-        Array<Model> chunks = create();
-        return new WorldScene(getLoadedMap(), chunks, getModelCatalog());
+        WorldScene scene = new WorldSceneLoader().load(
+            Gdx.files.classpath("maps/testfield.json"), createTileset(), new Material(), getModelCatalog());
+        loadedMap = scene.getMap();
+        return scene;
     }
 
     public static LoadedMap getLoadedMap() {
