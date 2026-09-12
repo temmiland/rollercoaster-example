@@ -25,6 +25,7 @@ final class LightingChecks {
         Model ground = builder.createBox(12, 0.1f, 12, new Material(ColorAttribute.createDiffuse(Color.WHITE)), Usage.Position | Usage.Normal);
         Model block = builder.createBox(2, 2, 2, new Material(ColorAttribute.createDiffuse(Color.WHITE)), Usage.Position | Usage.Normal);
         ModelInstance floor = new ModelInstance(ground, 0, -0.05f, 0);
+        floor.userData = WorldScene.TERRAIN_TAG;
         ModelInstance caster = new ModelInstance(block, 0, 1, 0);
         Array<ModelInstance> objects = new Array<>(); objects.add(floor); objects.add(caster);
         OrthographicCamera camera = camera(12, 0, 0);
@@ -35,6 +36,20 @@ final class LightingChecks {
             int lit = redAt(first, camera, 3f, 0);
             first.dispose();
             if (lit < 180 || dark > lit - 70) throw new AssertionError("Missing cast shadow: " + dark + " vs " + lit);
+
+            shadows.setStrength(0);
+            Pixmap modelUnshadowed = draw(target, batch, camera, objects);
+            int modelLit = redAt(modelUnshadowed, camera, 0f, 0f);
+            modelUnshadowed.dispose();
+            shadows.setStrength(1);
+            Pixmap modelShadowed = draw(target, batch, camera, objects);
+            int modelStillLit = redAt(modelShadowed, camera, 0f, 0f);
+            modelShadowed.dispose();
+            if (Math.abs(modelStillLit - modelLit) > 5) {
+                throw new AssertionError("Non-ground geometry received a ground shadow: "
+                    + modelLit + " vs " + modelStillLit);
+            }
+
             caster.transform.setToTranslation(4, 1, 4);
             Gdx.gl.glDepthMask(false);
             shadows.render(Vector3.Zero, objects);
