@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Array;
 import land.temmi.rollercoaster.render.LowResTarget;
 import land.temmi.rollercoaster.render.PixelCamera;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
+import land.temmi.rollercoaster.render.BillboardQuad;
 import land.temmi.rollercoaster.render.BillboardRenderer;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
@@ -44,6 +45,7 @@ public class ExampleGame extends ApplicationAdapter {
     private WorldScene worldScene;
     private final Array<ModelInstance> visibleInstances = new Array<>();
     private Texture spriteTexture;
+    private BillboardQuad billboardQuad;
     private BillboardRenderer playerSprite;
     private GridActor player;
     private InputSource input;
@@ -67,6 +69,19 @@ public class ExampleGame extends ApplicationAdapter {
         worldScene = ExampleMap.createScene();
         LoadedMap map = worldScene.getMap();
 
+        billboardQuad = new BillboardQuad();
+        createPlayerSprite();
+        player = new GridActor(map.tiles.getWidth(), map.tiles.getDepth(), 5f);
+        MapEntity playerEntity = findPlayer(map);
+        player.setTileAccess(new GridActor.TileAccess() {
+            @Override public boolean canEnter(int x, int z) { return !map.tiles.isBlocked(x, z); }
+            @Override public float heightAt(int x, int z) { return map.tiles.getHeight(x, z); }
+        });
+        player.setTile(playerEntity.x, playerEntity.z);
+        input = new KeyboardInput();
+    }
+
+    private void createPlayerSprite() {
         Pixmap sprite = new Pixmap(32, 24, Pixmap.Format.RGBA8888);
         paintSprite(sprite, 0, false);
         paintSprite(sprite, 16, true);
@@ -75,14 +90,9 @@ public class ExampleGame extends ApplicationAdapter {
         spriteTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         TextureRegion frameA = new TextureRegion(spriteTexture, 0, 0, 16, 24);
         TextureRegion frameB = new TextureRegion(spriteTexture, 16, 0, 16, 24);
-        playerSprite = new BillboardRenderer(spriteTexture, frameA, SUBJECT_WORLD_HEIGHT);
+        playerSprite = new BillboardRenderer(billboardQuad, spriteTexture, frameA, SUBJECT_WORLD_HEIGHT);
         playerSprite.setBottomPadding(3f / 24f);
         playerAnimation = new SpriteAnimation(0.14f, frameA, frameB);
-        player = new GridActor(map.tiles.getWidth(), map.tiles.getDepth(), 5f);
-        MapEntity playerEntity = findPlayer(map);
-        player.setTile(playerEntity.x, playerEntity.z);
-        player.setTileAccess((x, z) -> !ExampleMap.isBlocked(x, z));
-        input = new KeyboardInput();
     }
 
     @Override
@@ -104,7 +114,7 @@ public class ExampleGame extends ApplicationAdapter {
         pixelCamera.follow(subjectFootPosition, SUBJECT_WORLD_HEIGHT, SUBJECT_PIXEL_HEIGHT);
         pixelCamera.snapToPixelGrid(lowRes.getWidth(), lowRes.getHeight());
 
-        playerSprite.setPosition(subjectFootPosition.x, 0f, subjectFootPosition.z);
+        playerSprite.setPosition(subjectFootPosition);
 
         lowRes.begin();
         Gdx.gl.glClearColor(0.1f, 0.12f, 0.16f, 1f);
@@ -122,16 +132,18 @@ public class ExampleGame extends ApplicationAdapter {
         lowRes.blitToScreen(blitBatch);
     }
 
+    // Pixmap rows run top-down and the billboard maps its top edge to the first row,
+    // so the head is painted at the low row numbers and the legs at the high ones.
     private static void paintSprite(Pixmap sprite, int offsetX, boolean alternate) {
         sprite.setColor(0f, 0f, 0f, 0f);
         sprite.fillRectangle(offsetX, 0, 16, 24);
         sprite.setColor(0.95f, 0.55f, 0.15f, 1f);
-        sprite.fillRectangle(offsetX + 5, 15, 6, 7);
+        sprite.fillRectangle(offsetX + 5, 2, 6, 7);
         sprite.setColor(0.20f, 0.42f, 0.85f, 1f);
-        sprite.fillRectangle(offsetX + 4, 8, 8, 7);
+        sprite.fillRectangle(offsetX + 4, 9, 8, 7);
         sprite.setColor(0.15f, 0.20f, 0.32f, 1f);
-        sprite.fillRectangle(offsetX + (alternate ? 3 : 4), 3, 3, 5);
-        sprite.fillRectangle(offsetX + (alternate ? 10 : 9), 3, 3, 5);
+        sprite.fillRectangle(offsetX + (alternate ? 3 : 4), 16, 3, 5);
+        sprite.fillRectangle(offsetX + (alternate ? 10 : 9), 16, 3, 5);
     }
 
     private static MapEntity findPlayer(LoadedMap map) {
@@ -165,7 +177,8 @@ public class ExampleGame extends ApplicationAdapter {
             + "  depth " + lowRes.getDepthBits() + "b\n"
             + "FBO " + width + "x" + height
             + "  tile " + player.getTileX() + "," + player.getTileZ()
-            + "  world " + subjectFootPosition.x + "," + subjectFootPosition.z + "\n"
+            + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
+            + "," + subjectFootPosition.z + "\n"
             + "camera fov " + pixelCamera.getFovDegrees()
             + " pitch " + pixelCamera.getPitchDegrees()
             + " distance " + pixelCamera.getDistance();
@@ -173,6 +186,17 @@ public class ExampleGame extends ApplicationAdapter {
         blitBatch.begin();
         debugFont.draw(blitBatch, text, 10f, height - 10f);
         blitBatch.end();
+    }
+
+    /**
+     * A Pixmap-backed texture is unmanaged, so libGDX cannot restore it after a context loss.
+     * The regions and the billboard material point at it, so they are rebuilt along with it.
+     */
+    @Override
+    public void resume() {
+        playerSprite.dispose();
+        spriteTexture.dispose();
+        createPlayerSprite();
     }
 
     @Override
@@ -183,7 +207,9 @@ public class ExampleGame extends ApplicationAdapter {
         shapes.dispose();
         modelBatch.dispose();
         worldScene.dispose();
+        ExampleMap.dispose();
         playerSprite.dispose();
+        billboardQuad.dispose();
         spriteTexture.dispose();
     }
 }

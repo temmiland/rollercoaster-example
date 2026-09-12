@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,7 +24,10 @@ import land.temmi.trackside.example.ExampleGame;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
 import land.temmi.rollercoaster.asset.ModelDefinition;
 import land.temmi.trackside.example.ExampleMap;
+import land.temmi.rollercoaster.actor.GridActor;
+import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.MapLoader;
+import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.world.TilePrototype;
 import land.temmi.rollercoaster.world.Tileset;
 
@@ -50,6 +54,7 @@ public final class RenderSmokeTest extends ExampleGame {
         }
         verifyChunks();
         verifyMapDocument();
+        verifyTerrainSteps();
         verifyDepthAndTexture();
         if (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) throw new AssertionError("OpenGL error");
         System.out.println("PASS: four single-mesh chunks, opaque depth in both orders, texture UV transform, GL_NO_ERROR");
@@ -59,7 +64,8 @@ public final class RenderSmokeTest extends ExampleGame {
     private void verifyMapDocument() {
         TilePrototype placeholder = new TilePrototype(null);
         Tileset tileset = new Tileset().add("grass", placeholder).add("lightGrass", placeholder)
-            .add("path", placeholder).add("plateau", placeholder).add("house", placeholder);
+            .add("path", placeholder).add("plateau", placeholder).add("ramp", placeholder)
+            .add("house", placeholder);
         land.temmi.rollercoaster.world.LoadedMap map = new MapLoader().load(
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
@@ -71,14 +77,62 @@ public final class RenderSmokeTest extends ExampleGame {
             || map.entities.first().x != 12 || map.entities.first().z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
         }
+        if (map.tiles.getHeight(18, 10) != 0f || map.tiles.getHeight(18, 9) != 0.5f
+            || map.tiles.getHeight(18, 8) != 1f || map.tiles.getHeight(17, 9) != 0f) {
+            throw new AssertionError("Ramp does not bridge flat ground and the plateau");
+        }
+    }
+
+    /** Walks the actor up the ramp and checks the cliff beside it stays closed. */
+    private void verifyTerrainSteps() {
+        land.temmi.rollercoaster.world.TileMap tiles = ExampleMap.getLoadedMap().tiles;
+        GridActor.TileAccess access = new GridActor.TileAccess() {
+            @Override public boolean canEnter(int x, int z) { return !tiles.isBlocked(x, z); }
+            @Override public float heightAt(int x, int z) { return tiles.getHeight(x, z); }
+        };
+        if (!climbs(access, 18, 10) || !climbs(access, 18, 9)) {
+            throw new AssertionError("Actor cannot walk up the ramp");
+        }
+        if (climbs(access, 17, 9) || climbs(access, 19, 9)) {
+            throw new AssertionError("Actor can climb the cliff instead of using the ramp");
+        }
+        GridActor actor = actorAt(access, 18, 10);
+        actor.update(0f, MoveIntent.UP);
+        actor.update(1f, MoveIntent.UP);
+        if (Math.abs(actor.getPosition().y - 0.5f) > 1e-5f) {
+            throw new AssertionError("Actor does not stand on the ramp surface: " + actor.getPosition().y);
+        }
+    }
+
+    private static GridActor actorAt(GridActor.TileAccess access, int x, int z) {
+        GridActor actor = new GridActor(24, 24, 5f);
+        actor.setTileAccess(access);
+        actor.setTile(x, z);
+        return actor;
+    }
+
+    private static boolean climbs(GridActor.TileAccess access, int x, int z) {
+        GridActor actor = actorAt(access, x, z);
+        actor.update(0.001f, MoveIntent.UP);
+        return actor.isMoving();
     }
 
     private void verifyChunks() {
-        Array<Model> chunks = ExampleMap.create();
-        Array<Model> props = ExampleMap.createPropModels();
+        // createScene exercises the real path: it bakes the chunks, validates the prop
+        // footprint against the collision layer and instantiates the catalog models.
+        WorldScene scene = ExampleMap.createScene();
         try {
+            Array<Model> chunks = new Array<>();
+            for (Model chunk : sceneChunks(scene)) chunks.add(chunk);
             if (chunks.size != 4) throw new AssertionError("Expected four chunks");
-            if (props.size != 1) throw new AssertionError("Expected one map prop model");
+            if (scene.getInstances().size != 5) {
+                throw new AssertionError("Expected four chunk instances and one prop");
+            }
+            Array<ModelInstance> visible = new Array<>();
+            scene.getVisibleInstances(housePeekCamera(), visible);
+            if (!visible.contains(scene.getInstances().peek(), true)) {
+                throw new AssertionError("House prop was culled at its own position");
+            }
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
             if (!"gltf:models/house.gltf".equals(house.source)
                 || house.offsetX != -1f || house.offsetY != 0f || house.offsetZ != -1f
@@ -99,8 +153,33 @@ public final class RenderSmokeTest extends ExampleGame {
                 for (float value : vertices) if (!Float.isFinite(value)) throw new AssertionError("Invalid vertex");
             }
         } finally {
-            for (Model chunk : chunks) chunk.dispose();
+            scene.dispose();
         }
+    }
+
+    private static Array<Model> sceneChunks(WorldScene scene) {
+        Array<Model> chunks = new Array<>();
+        for (ModelInstance instance : scene.getInstances()) {
+            if (instance.model != null && !chunks.contains(instance.model, true)) chunks.add(instance.model);
+        }
+        chunks.removeValue(scene.getInstances().peek().model, true); // the prop model
+        return chunks;
+    }
+
+    /**
+     * Frames the house closely from the south. The far plane deliberately sits in front of the
+     * world origin, so a prop culled by untransformed model-space bounds fails this check.
+     */
+    private static PerspectiveCamera housePeekCamera() {
+        PerspectiveCamera camera = new PerspectiveCamera(30f, 640f, 360f);
+        camera.position.set(7.5f, 3f, 14f);
+        camera.direction.set(0f, 0f, -1f);
+        camera.up.set(0f, 1f, 0f);
+        camera.near = 1f;
+        camera.far = 9f;
+        camera.normalizeUp();
+        camera.update();
+        return camera;
     }
 
     private void verifyDepthAndTexture() {
