@@ -12,3 +12,6 @@ The build uses the sibling Rollercoaster repository through `includeBuild('../ro
 ```
 
 Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android` und `platforms/ios`.
+
+Im Desktoplauf zeigt `example-game` den Tag-/Nachtzyklus. `N` springt eine Stunde weiter,
+`Space` pausiert die Uhr und `L` schaltet die Punktlichtquelle am Haus.
