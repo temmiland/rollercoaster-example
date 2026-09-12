@@ -48,6 +48,7 @@ public class ExampleGame extends ApplicationAdapter {
     private LightingEnvironment lighting;
     private DayNightCycle dayNightCycle;
     private PointLightSource houseLight;
+    private PointLightSource porchLight;
     private WorldScene worldScene;
     private final Array<ModelInstance> visibleInstances = new Array<>();
     private Texture spriteTexture;
@@ -74,7 +75,10 @@ public class ExampleGame extends ApplicationAdapter {
         lighting = new LightingEnvironment();
         dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f);
         houseLight = new PointLightSource(8f, 1.5f, 9f, new Color(1f, 0.45f, 0.12f, 1f), 2.2f, 5f);
+        porchLight = new PointLightSource(7f, 3f, 8f, new Color(0.45f, 0.65f, 1f, 1f), 3f, 7f)
+            .setSpot(new Vector3(0f, -1f, 0f), 18f, 42f);
         lighting.addPointLight(houseLight);
+        lighting.addPointLight(porchLight);
         modelBatch = new ModelBatch(new WorldShaderProvider(lighting));
         worldScene = ExampleMap.createScene();
         LoadedMap map = worldScene.getMap();
@@ -115,7 +119,10 @@ public class ExampleGame extends ApplicationAdapter {
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) debugVisible = !debugVisible;
-        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) houseLight.enabled = !houseLight.enabled;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+            houseLight.enabled = !houseLight.enabled;
+            porchLight.enabled = houseLight.enabled;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) dayNightCycle.setPaused(!dayNightCycle.isPaused());
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             dayNightCycle.setTimeOfDay((dayNightCycle.getTimeOfDay() + 1f) % 24f);
@@ -196,7 +203,7 @@ public class ExampleGame extends ApplicationAdapter {
             + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
             + "," + subjectFootPosition.z + "\n"
             + "time " + String.format(java.util.Locale.ROOT, "%.1fh", dayNightCycle.getTimeOfDay())
-            + "  lamp " + (houseLight.enabled ? "on" : "off") + "\n"
+            + "  lamps " + (houseLight.enabled ? "on" : "off") + "\n"
             + "camera fov " + pixelCamera.getFovDegrees()
             + " pitch " + pixelCamera.getPitchDegrees()
             + " distance " + pixelCamera.getDistance();
