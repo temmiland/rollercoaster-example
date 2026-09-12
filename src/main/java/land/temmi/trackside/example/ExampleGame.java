@@ -9,9 +9,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -24,18 +21,20 @@ import land.temmi.rollercoaster.render.BillboardRenderer;
 import land.temmi.rollercoaster.render.DayNightCycle;
 import land.temmi.rollercoaster.render.DirectionalShadowMap;
 import land.temmi.rollercoaster.render.LightingEnvironment;
+import land.temmi.rollercoaster.asset.SpriteAtlas;
+import land.temmi.rollercoaster.asset.SpriteDefinition;
+import land.temmi.rollercoaster.asset.SpriteManifest;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
 import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.actor.GridActor;
-import land.temmi.rollercoaster.actor.SpriteAnimation;
+import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
 import land.temmi.rollercoaster.input.InputSource;
 import land.temmi.rollercoaster.input.KeyboardInput;
 
 public class ExampleGame extends ApplicationAdapter {
 
-    private static final float SUBJECT_WORLD_HEIGHT = 1.8f;
     private static final float SUBJECT_PIXEL_HEIGHT = 48f;
 
     private LowResTarget lowRes;
@@ -53,12 +52,14 @@ public class ExampleGame extends ApplicationAdapter {
     private final Array<ModelInstance> shadowCasters = new Array<>();
     private WorldScene worldScene;
     private final Array<ModelInstance> visibleInstances = new Array<>();
-    private Texture spriteTexture;
+    private SpriteAtlas playerAtlas;
+    private SpriteDefinition playerDefinition;
     private BillboardQuad billboardQuad;
     private BillboardRenderer playerSprite;
     private GridActor player;
     private InputSource input;
-    private SpriteAnimation playerAnimation;
+    private DirectionalSpriteAnimation playerAnimation;
+    private float subjectWorldHeight;
     private final Vector3 subjectFootPosition = new Vector3(0f, 0f, 0f);
     private boolean debugVisible;
 
@@ -92,17 +93,14 @@ public class ExampleGame extends ApplicationAdapter {
     }
 
     private void createPlayerSprite() {
-        Pixmap sprite = new Pixmap(32, 24, Pixmap.Format.RGBA8888);
-        paintSprite(sprite, 0, false);
-        paintSprite(sprite, 16, true);
-        spriteTexture = new Texture(sprite);
-        sprite.dispose();
-        spriteTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        TextureRegion frameA = new TextureRegion(spriteTexture, 0, 0, 16, 24);
-        TextureRegion frameB = new TextureRegion(spriteTexture, 16, 0, 16, 24);
-        playerSprite = new BillboardRenderer(billboardQuad, spriteTexture, frameA, SUBJECT_WORLD_HEIGHT);
+        SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
+        playerAtlas = new SpriteAtlas(manifest.atlas);
+        playerDefinition = manifest.sprite("player");
+        playerAnimation = new DirectionalSpriteAnimation(playerAtlas, playerDefinition);
+        subjectWorldHeight = playerDefinition.worldHeight;
+        playerSprite = new BillboardRenderer(billboardQuad, playerAtlas.getTexture(),
+            playerAnimation.getFrame(), subjectWorldHeight);
         playerSprite.setBottomPadding(3f / 24f);
-        playerAnimation = new SpriteAnimation(0.14f, frameA, frameB);
     }
 
     @Override
@@ -126,12 +124,13 @@ public class ExampleGame extends ApplicationAdapter {
         dayNightCycle.update(delta);
         exampleLighting.update(dayNightCycle.getSituation());
         player.update(delta, input.pollMove());
-        playerAnimation.setPlaying(player.isMoving());
+        playerAnimation.setFacing(player.getFacing());
+        playerAnimation.setMoving(player.isMoving());
         playerAnimation.update(delta);
         playerSprite.setRegion(playerAnimation.getFrame());
         subjectFootPosition.set(player.getPosition());
 
-        pixelCamera.follow(subjectFootPosition, SUBJECT_WORLD_HEIGHT, SUBJECT_PIXEL_HEIGHT);
+        pixelCamera.follow(subjectFootPosition, subjectWorldHeight, SUBJECT_PIXEL_HEIGHT);
         pixelCamera.snapToPixelGrid(lowRes.getWidth(), lowRes.getHeight());
 
         playerSprite.setPosition(subjectFootPosition);
@@ -160,20 +159,6 @@ public class ExampleGame extends ApplicationAdapter {
 
     protected void setDemoTime(float hours) {
         dayNightCycle.setTimeOfDay(hours).enterMap().setPaused(true);
-    }
-
-    // Pixmap rows run top-down and the billboard maps its top edge to the first row,
-    // so the head is painted at the low row numbers and the legs at the high ones.
-    private static void paintSprite(Pixmap sprite, int offsetX, boolean alternate) {
-        sprite.setColor(0f, 0f, 0f, 0f);
-        sprite.fillRectangle(offsetX, 0, 16, 24);
-        sprite.setColor(0.95f, 0.55f, 0.15f, 1f);
-        sprite.fillRectangle(offsetX + 5, 2, 6, 7);
-        sprite.setColor(0.20f, 0.42f, 0.85f, 1f);
-        sprite.fillRectangle(offsetX + 4, 9, 8, 7);
-        sprite.setColor(0.15f, 0.20f, 0.32f, 1f);
-        sprite.fillRectangle(offsetX + (alternate ? 3 : 4), 16, 3, 5);
-        sprite.fillRectangle(offsetX + (alternate ? 10 : 9), 16, 3, 5);
     }
 
     private static MapEntity findPlayer(LoadedMap map) {
@@ -223,17 +208,6 @@ public class ExampleGame extends ApplicationAdapter {
         blitBatch.end();
     }
 
-    /**
-     * A Pixmap-backed texture is unmanaged, so libGDX cannot restore it after a context loss.
-     * The regions and the billboard material point at it, so they are rebuilt along with it.
-     */
-    @Override
-    public void resume() {
-        playerSprite.dispose();
-        spriteTexture.dispose();
-        createPlayerSprite();
-    }
-
     @Override
     public void dispose() {
         lowRes.dispose();
@@ -247,6 +221,6 @@ public class ExampleGame extends ApplicationAdapter {
         ExampleMap.dispose();
         playerSprite.dispose();
         billboardQuad.dispose();
-        spriteTexture.dispose();
+        playerAtlas.dispose();
     }
 }

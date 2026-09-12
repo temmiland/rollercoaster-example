@@ -22,7 +22,12 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import land.temmi.trackside.example.ExampleGame;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
+import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
+import land.temmi.rollercoaster.actor.Facing;
 import land.temmi.rollercoaster.asset.ModelDefinition;
+import land.temmi.rollercoaster.asset.SpriteAtlas;
+import land.temmi.rollercoaster.asset.SpriteDefinition;
+import land.temmi.rollercoaster.asset.SpriteManifest;
 import land.temmi.trackside.example.ExampleMap;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.MoveIntent;
@@ -58,9 +63,42 @@ public final class RenderSmokeTest extends ExampleGame {
         verifyMapDocument();
         verifyTerrainSteps();
         verifyDepthAndTexture();
+        verifySprites();
         if (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) throw new AssertionError("OpenGL error");
-        System.out.println("PASS: four single-mesh chunks, opaque depth in both orders, texture UV transform, GL_NO_ERROR");
+        System.out.println("PASS: four single-mesh chunks, opaque depth in both orders, texture UV transform, four-direction sprite atlas, GL_NO_ERROR");
         Gdx.app.exit();
+    }
+
+    private void verifySprites() {
+        SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
+        SpriteDefinition definition = manifest.sprite("player");
+        if (!"sprites/player.atlas".equals(manifest.atlas)
+            || definition.worldHeight != 1.8f || definition.frameDuration != 0.14f) {
+            throw new AssertionError("Sprite manifest metadata did not load");
+        }
+        SpriteAtlas atlas = new SpriteAtlas(manifest.atlas);
+        try {
+            DirectionalSpriteAnimation animation = new DirectionalSpriteAnimation(atlas, definition);
+            int previousX = -1;
+            for (Facing facing : Facing.values()) {
+                animation.setFacing(facing);
+                animation.setMoving(false);
+                if (animation.getFrame().getRegionWidth() != 16 || animation.getFrame().getRegionHeight() != 24) {
+                    throw new AssertionError("Sprite frame dimensions are not 16x24");
+                }
+                if (previousX == animation.getFrame().getRegionX()) {
+                    throw new AssertionError("Sprite directions share one atlas region");
+                }
+                previousX = animation.getFrame().getRegionX();
+            }
+            animation.setMoving(true);
+            animation.update(0.15f);
+            if (animation.getFrame().getRegionWidth() != 16 || !animation.isMoving()) {
+                throw new AssertionError("Sprite walk animation did not advance");
+            }
+        } finally {
+            atlas.dispose();
+        }
     }
 
     private void verifyMapDocument() {

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "atlas": "sprites/player.atlas",
+  "sprites": [
+    {
+      "id": "player",
+      "height": 1.8,
+      "frameDuration": 0.14,
+      "directions": {
+        "north": { "idle": "player_north_idle", "walk": ["player_north_walk_a", "player_north_walk_b"] },
+        "east":  { "idle": "player_east_idle",  "walk": ["player_east_walk_a",  "player_east_walk_b"] },
+        "south": { "idle": "player_south_idle", "walk": ["player_south_walk_a", "player_south_walk_b"] },
+        "west":  { "idle": "player_west_idle",  "walk": ["player_west_walk_a",  "player_west_walk_b"] }
+      }
+    }
+  ]
+}

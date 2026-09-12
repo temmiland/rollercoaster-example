@@ -1,0 +1,77 @@
+player.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+size: 192,24
+player_north_idle
+xy: 0,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_north_walk_a
+xy: 16,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_north_walk_b
+xy: 32,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_east_idle
+xy: 48,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_east_walk_a
+xy: 64,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_east_walk_b
+xy: 80,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_south_idle
+xy: 96,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_south_walk_a
+xy: 112,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_south_walk_b
+xy: 128,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_west_idle
+xy: 144,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_west_walk_a
+xy: 160,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
+player_west_walk_b
+xy: 176,0
+size: 16,24
+orig: 16,24
+offset: 0,0
+index: -1
