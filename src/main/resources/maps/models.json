@@ -9,6 +9,15 @@
       "height": 4,
       "bounds": { "min": [-1.8, 0, -1.3], "max": [2.8, 4, 2.3] },
       "collision": { "min": [-2, -2], "max": [2, 1] }
+    },
+    {
+      "id": "streetLamp",
+      "source": "gltf:models/street-lamp.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 2.9,
+      "bounds": { "min": [-0.2, 0, -0.2], "max": [0.2, 2.9, 0.2] },
+      "collision": { "min": [0, 0], "max": [0, 0] }
     }
   ]
 }

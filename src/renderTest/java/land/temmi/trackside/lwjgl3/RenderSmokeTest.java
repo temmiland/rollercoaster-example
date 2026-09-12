@@ -32,6 +32,7 @@ import land.temmi.trackside.example.ExampleMap;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.MapLoader;
+import land.temmi.rollercoaster.world.MapProp;
 import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.world.TileShape;
@@ -113,8 +114,10 @@ public final class RenderSmokeTest extends ExampleGame {
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
             || map.tiles.isBlocked(6, 8) || map.tiles.isBlocked(10, 11)
-            || map.props.size != 1 || map.entities.size != 1
+            || map.props.size != 3 || map.entities.size != 1
             || map.props.first().elevation != 0f
+            || !"streetLamp".equals(map.props.get(1).model) || map.props.get(1).x != 10.8f
+            || map.props.get(1).z != 13f || map.props.get(2).z != 5f
             || !"player".equals(map.entities.first().type)
             || map.entities.first().x != 12 || map.entities.first().z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
@@ -177,18 +180,26 @@ public final class RenderSmokeTest extends ExampleGame {
             Array<Model> chunks = new Array<>();
             for (Model chunk : sceneChunks(scene)) chunks.add(chunk);
             if (chunks.size != 4) throw new AssertionError("Expected four chunks");
-            if (scene.getInstances().size != 5) {
-                throw new AssertionError("Expected four chunk instances and one prop");
+            if (scene.getInstances().size != 7) {
+                throw new AssertionError("Expected four chunk instances, house, and two lamps");
             }
             Array<ModelInstance> visible = new Array<>();
             scene.getVisibleInstances(housePeekCamera(), visible);
-            if (!visible.contains(scene.getInstances().peek(), true)) {
+            ModelInstance houseInstance = null;
+            for (ModelInstance instance : scene.getInstances()) {
+                if (instance.userData instanceof MapProp && "house".equals(((MapProp) instance.userData).model)) {
+                    houseInstance = instance;
+                    break;
+                }
+            }
+            if (houseInstance == null || !visible.contains(houseInstance, true)) {
                 throw new AssertionError("House prop was culled at its own position");
             }
             // The footprint is authored on the model, so placing the prop must block these tiles
             // even though the map document marks nothing.
             land.temmi.rollercoaster.world.TileMap tiles = scene.getMap().tiles;
             if (!tiles.isBlocked(6, 8) || !tiles.isBlocked(10, 11) || !tiles.isBlocked(8, 10)
+                || !tiles.isBlocked(10, 5) || !tiles.isBlocked(10, 13)
                 || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8) || tiles.isBlocked(10, 12)) {
                 throw new AssertionError("Model collision was not merged into the map collision");
             }
@@ -196,7 +207,7 @@ public final class RenderSmokeTest extends ExampleGame {
             for (int z = 0; z < tiles.getDepth(); z++) {
                 for (int x = 0; x < tiles.getWidth(); x++) if (tiles.isBlocked(x, z)) blocked++;
             }
-            if (blocked != 20) throw new AssertionError("Expected a 5x4 derived footprint, got " + blocked);
+            if (blocked != 22) throw new AssertionError("Expected house and lamp footprints, got " + blocked);
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
             if (!"gltf:models/house.gltf".equals(house.source)
                 || house.offsetX != -1f || house.offsetY != 0f || house.offsetZ != -1f
@@ -206,6 +217,16 @@ public final class RenderSmokeTest extends ExampleGame {
                 || house.collisionMinX != -2 || house.collisionMaxX != 2
                 || house.collisionMinZ != -2 || house.collisionMaxZ != 1) {
                 throw new AssertionError("Model manifest did not load house metadata");
+            }
+            ModelDefinition lamp = ExampleMap.getModelCatalog().definition("streetLamp");
+            if (!"gltf:models/street-lamp.gltf".equals(lamp.source)
+                || lamp.offsetX != 0f || lamp.offsetY != 0f || lamp.offsetZ != 0f
+                || lamp.scale != 1f || lamp.height != 2.9f
+                || lamp.boundsMinX != -0.2f || lamp.boundsMinY != 0f || lamp.boundsMinZ != -0.2f
+                || lamp.boundsMaxX != 0.2f || lamp.boundsMaxY != 2.9f || lamp.boundsMaxZ != 0.2f
+                || lamp.collisionMinX != 0 || lamp.collisionMaxX != 0
+                || lamp.collisionMinZ != 0 || lamp.collisionMaxZ != 0) {
+                throw new AssertionError("Model manifest did not load street lamp metadata");
             }
             for (Model chunk : chunks) {
                 if (chunk.meshes.size != 1 || chunk.meshParts.size != 1 || chunk.materials.size != 1) {
@@ -224,9 +245,9 @@ public final class RenderSmokeTest extends ExampleGame {
     private static Array<Model> sceneChunks(WorldScene scene) {
         Array<Model> chunks = new Array<>();
         for (ModelInstance instance : scene.getInstances()) {
-            if (instance.model != null && !chunks.contains(instance.model, true)) chunks.add(instance.model);
+            if (instance.userData == WorldScene.TERRAIN_TAG && instance.model != null
+                && !chunks.contains(instance.model, true)) chunks.add(instance.model);
         }
-        chunks.removeValue(scene.getInstances().peek().model, true); // the prop model
         return chunks;
     }
 

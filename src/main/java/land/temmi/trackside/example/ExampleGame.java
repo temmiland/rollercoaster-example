@@ -139,7 +139,6 @@ public class ExampleGame extends ApplicationAdapter {
 
         shadowCasters.clear();
         shadowCasters.addAll(worldScene.getInstances());
-        shadowCasters.addAll(exampleLighting.instances);
         shadowMap.render(subjectFootPosition, shadowCasters);
 
         lowRes.begin();
@@ -148,7 +147,6 @@ public class ExampleGame extends ApplicationAdapter {
 
         modelBatch.begin(pixelCamera.camera);
         modelBatch.render(worldScene.getVisibleInstances(pixelCamera.camera, visibleInstances));
-        modelBatch.render(exampleLighting.instances);
         modelBatch.render(playerSprite);
         modelBatch.end();
 

@@ -1,8 +1,8 @@
 # Lighting demo
 
 Run `./gradlew :platforms:desktop:run`. The house and terrain cast sun shadows.
-Two warm amber street lamps illuminate the path; two matching emissive window materials and exterior
-spot lights demonstrate house lighting. The clock runs for 90 seconds per in-game day, but
+Two `streetLamp` map props with warm amber bulbs illuminate the path; two matching emissive window
+materials and exterior spot lights demonstrate house lighting. The clock runs for 90 seconds per in-game day, but
 lighting itself uses four fixed situations. The clock-selected situation is applied when a map
 is entered, so crossing a threshold does not change the current map in the middle of a frame.
 

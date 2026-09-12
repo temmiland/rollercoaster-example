@@ -1,27 +1,22 @@
 package land.temmi.trackside.example;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import land.temmi.rollercoaster.render.LightingSituation;
 import land.temmi.rollercoaster.render.LightingEnvironment;
 import land.temmi.rollercoaster.render.PointLightSource;
+import land.temmi.rollercoaster.world.MapProp;
 import land.temmi.rollercoaster.world.WorldScene;
-import land.temmi.rollercoaster.world.TerrainSurface;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 /** Window emission and street lamps placed in the example scene. */
 public final class ExampleLighting implements Disposable {
     private static final float EMISSION_BOOST = 2f;
-    final Array<ModelInstance> instances = new Array<>();
-    private final Array<Model> models = new Array<>();
     private final Array<PointLightSource> lights = new Array<>();
     private final Array<ColorAttribute> emission = new Array<>();
     private final Array<ColorAttribute> windowBaseColors = new Array<>();
@@ -51,9 +46,10 @@ public final class ExampleLighting implements Disposable {
                 window(instance, 1.7f);
             }
         }
-        TerrainSurface terrain = new TerrainSurface(scene.getMap().tiles);
-        lamp(10.8f, terrain.heightAt(10.8f, 13f), 13f);
-        lamp(10.8f, terrain.heightAt(10.8f, 5f), 5f);
+        for (ModelInstance instance : scene.getInstances()) {
+            if (!(instance.userData instanceof MapProp)) continue;
+            if ("streetLamp".equals(((MapProp) instance.userData).model)) lamp(instance);
+        }
     }
 
     private void window(ModelInstance house, float x) {
@@ -63,19 +59,14 @@ public final class ExampleLighting implements Disposable {
             .setSpot(direction, 75f, 145f));
     }
 
-    private void lamp(float x, float y, float z) {
-        ModelBuilder builder = new ModelBuilder();
-        Model post = builder.createBox(0.12f, 2.6f, 0.12f,
-            new Material(ColorAttribute.createDiffuse(new Color(0.16f, 0.19f, 0.23f, 1f))), Usage.Position | Usage.Normal);
-        models.add(post);
-        instances.add(new ModelInstance(post, x, y + 1.3f, z));
-        Model bulb = builder.createBox(0.4f, 0.3f, 0.4f,
-            new Material(ColorAttribute.createDiffuse(warm), ColorAttribute.createEmissive(warm)), Usage.Position | Usage.Normal);
-        models.add(bulb);
-        ModelInstance fixture = new ModelInstance(bulb, x, y + 2.75f, z);
-        instances.add(fixture);
-        emission.add((ColorAttribute) fixture.materials.first().get(ColorAttribute.Emissive));
-        add(new PointLightSource(x, y + 2.7f, z, warm, 0.70f, 7f));
+    private void lamp(ModelInstance instance) {
+        for (Material material : instance.materials) {
+            if (!"lampGlow".equals(material.id)) continue;
+            ColorAttribute glow = (ColorAttribute) material.get(ColorAttribute.Emissive);
+            if (glow != null) emission.add(glow);
+        }
+        Vector3 position = new Vector3(0f, 2.7f, 0f).mul(instance.transform);
+        add(new PointLightSource(position.x, position.y, position.z, warm, 0.70f, 7f));
     }
 
     private void add(PointLightSource light) {
@@ -110,6 +101,5 @@ public final class ExampleLighting implements Disposable {
 
     @Override public void dispose() {
         for (PointLightSource light : lights) environment.removePointLight(light);
-        for (Model model : models) model.dispose();
     }
 }
