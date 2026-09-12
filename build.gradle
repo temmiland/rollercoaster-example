@@ -37,3 +37,13 @@ tasks.register('renderSmokeTest', JavaExec) {
         jvmArgs += ['-XstartOnFirstThread']
     }
 }
+
+tasks.register('lightingSmokeTest', JavaExec) {
+    group = 'verification'
+    description = 'Checks cast shadows, local lights and emission in a desktop OpenGL context.'
+    classpath = sourceSets.renderTest.runtimeClasspath
+    mainClass = 'land.temmi.trackside.lwjgl3.LightingSmokeTest'
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+        jvmArgs += ['-XstartOnFirstThread']
+    }
+}

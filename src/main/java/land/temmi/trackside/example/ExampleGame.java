@@ -22,8 +22,8 @@ import land.temmi.rollercoaster.render.WorldShaderProvider;
 import land.temmi.rollercoaster.render.BillboardQuad;
 import land.temmi.rollercoaster.render.BillboardRenderer;
 import land.temmi.rollercoaster.render.DayNightCycle;
+import land.temmi.rollercoaster.render.DirectionalShadowMap;
 import land.temmi.rollercoaster.render.LightingEnvironment;
-import land.temmi.rollercoaster.render.PointLightSource;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
 import land.temmi.rollercoaster.world.TerrainRules;
@@ -48,8 +48,9 @@ public class ExampleGame extends ApplicationAdapter {
     private ModelBatch modelBatch;
     private LightingEnvironment lighting;
     private DayNightCycle dayNightCycle;
-    private PointLightSource houseLight;
-    private PointLightSource porchLight;
+    private DirectionalShadowMap shadowMap;
+    private ExampleLighting exampleLighting;
+    private final Array<ModelInstance> shadowCasters = new Array<>();
     private WorldScene worldScene;
     private final Array<ModelInstance> visibleInstances = new Array<>();
     private Texture spriteTexture;
@@ -75,13 +76,10 @@ public class ExampleGame extends ApplicationAdapter {
 
         lighting = new LightingEnvironment();
         dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f);
-        houseLight = new PointLightSource(8f, 1.5f, 9f, new Color(1f, 0.45f, 0.12f, 1f), 2.2f, 5f);
-        porchLight = new PointLightSource(7f, 3f, 8f, new Color(0.45f, 0.65f, 1f, 1f), 3f, 7f)
-            .setSpot(new Vector3(0f, -1f, 0f), 18f, 42f);
-        lighting.addPointLight(houseLight);
-        lighting.addPointLight(porchLight);
-        modelBatch = new ModelBatch(new WorldShaderProvider(lighting));
+        shadowMap = new DirectionalShadowMap(lighting).setWorldSize(40f);
+        modelBatch = new ModelBatch(new WorldShaderProvider(lighting, shadowMap));
         worldScene = ExampleMap.createScene();
+        exampleLighting = new ExampleLighting(lighting, worldScene);
         LoadedMap map = worldScene.getMap();
 
         billboardQuad = new BillboardQuad();
@@ -118,14 +116,14 @@ public class ExampleGame extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
         if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) debugVisible = !debugVisible;
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-            houseLight.enabled = !houseLight.enabled;
-            porchLight.enabled = houseLight.enabled;
+            exampleLighting.toggle();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) dayNightCycle.setPaused(!dayNightCycle.isPaused());
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             dayNightCycle.setTimeOfDay((dayNightCycle.getTimeOfDay() + 1f) % 24f);
         }
         dayNightCycle.update(delta);
+        exampleLighting.update();
         player.update(delta, input.pollMove());
         playerAnimation.setPlaying(player.isMoving());
         playerAnimation.update(delta);
@@ -137,12 +135,18 @@ public class ExampleGame extends ApplicationAdapter {
 
         playerSprite.setPosition(subjectFootPosition);
 
+        shadowCasters.clear();
+        shadowCasters.addAll(worldScene.getInstances());
+        shadowCasters.addAll(exampleLighting.instances);
+        shadowMap.render(subjectFootPosition, shadowCasters);
+
         lowRes.begin();
         Gdx.gl.glClearColor(0.1f, 0.12f, 0.16f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(pixelCamera.camera);
         modelBatch.render(worldScene.getVisibleInstances(pixelCamera.camera, visibleInstances));
+        modelBatch.render(exampleLighting.instances);
         modelBatch.render(playerSprite);
         modelBatch.end();
 
@@ -151,6 +155,10 @@ public class ExampleGame extends ApplicationAdapter {
         lowRes.end();
 
         lowRes.blitToScreen(blitBatch);
+    }
+
+    protected void setDemoTime(float hours) {
+        dayNightCycle.setTimeOfDay(hours).setPaused(true);
     }
 
     // Pixmap rows run top-down and the billboard maps its top edge to the first row,
@@ -201,7 +209,7 @@ public class ExampleGame extends ApplicationAdapter {
             + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
             + "," + subjectFootPosition.z + "\n"
             + "time " + String.format(java.util.Locale.ROOT, "%.1fh", dayNightCycle.getTimeOfDay())
-            + "  lamps " + (houseLight.enabled ? "on" : "off") + "\n"
+            + "  lamps " + (exampleLighting.isEnabled() ? "on" : "off") + "\n"
             + "camera fov " + pixelCamera.getFovDegrees()
             + " pitch " + pixelCamera.getPitchDegrees()
             + " distance " + pixelCamera.getDistance();
@@ -229,6 +237,8 @@ public class ExampleGame extends ApplicationAdapter {
         debugFont.dispose();
         shapes.dispose();
         modelBatch.dispose();
+        shadowMap.dispose();
+        exampleLighting.dispose();
         worldScene.dispose();
         ExampleMap.dispose();
         playerSprite.dispose();
