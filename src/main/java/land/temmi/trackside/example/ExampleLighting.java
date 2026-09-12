@@ -23,7 +23,8 @@ public final class ExampleLighting implements Disposable {
     private final Array<PointLightSource> lights = new Array<>();
     private final Array<ColorAttribute> emission = new Array<>();
     private final LightingEnvironment environment;
-    private final Color warm = new Color(1f, 0.82f, 0.56f, 1f);
+    /** Shared amber tone for window emission, bulbs, and their local light. */
+    private final Color warm = new Color(1f, 0.62f, 0.28f, 1f);
     private boolean enabled = true;
     private final Array<Float> intensities = new Array<>();
     private LightingSituation situation = LightingSituation.DAY;
