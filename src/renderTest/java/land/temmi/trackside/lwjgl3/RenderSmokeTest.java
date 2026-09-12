@@ -200,7 +200,11 @@ public final class RenderSmokeTest extends ExampleGame {
             land.temmi.rollercoaster.world.TileMap tiles = scene.getMap().tiles;
             if (!tiles.isBlocked(6, 8) || !tiles.isBlocked(10, 11) || !tiles.isBlocked(8, 10)
                 || !tiles.isBlocked(10, 5) || !tiles.isBlocked(10, 13)
-                || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8) || tiles.isBlocked(10, 12)) {
+                || tiles.isBlocked(9, 5) || tiles.isBlocked(11, 5)
+                || tiles.isBlocked(10, 4) || tiles.isBlocked(10, 6)
+                || tiles.isBlocked(9, 13) || tiles.isBlocked(11, 13)
+                || tiles.isBlocked(10, 12) || tiles.isBlocked(10, 14)
+                || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8)) {
                 throw new AssertionError("Model collision was not merged into the map collision");
             }
             int blocked = 0;
