@@ -13,6 +13,10 @@ The build uses the sibling Rollercoaster repository through `includeBuild('../ro
 
 Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android` und `platforms/ios`.
 
+Die Laufzeit lädt die Welt über `WorldSceneLoader` und kombiniert Tastatursteuerung mit dem
+virtuellen D-Pad der `TouchInput`-Zone unten links. Das Gamepad-Adapter-API der Engine kann von
+plattform-spezifischen Launchern über `CombinedInput` ergänzt werden.
+
 Im Desktoplauf zeigt `example-game` vier feste Lichtsituationen. `K` schaltet sie sofort durch.
 Die Uhr läuft im Hintergrund weiter; beim nächsten Kartenbetreten wird die Situation anhand der
 Uhrzeit übernommen. `N` springt eine Stunde weiter, `Space` pausiert die Uhr und `L`
