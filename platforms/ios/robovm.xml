@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <executable name="example-game" />
+    <mainClass>land.temmi.trackside.ios.IOSLauncher</mainClass>
+    <forceLinkClasses>
+        <pattern name="com.badlogic.gdx.**" />
+    </forceLinkClasses>
+</config>

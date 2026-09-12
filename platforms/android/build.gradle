@@ -1,0 +1,21 @@
+plugins {
+    alias(libs.plugins.android.app)
+}
+
+android {
+    namespace 'land.temmi.trackside.android'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'land.temmi.trackside.example'
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName '0.1.0'
+    }
+}
+
+dependencies {
+    implementation project(':')
+    implementation libs.gdx.backend.android
+}

@@ -15,4 +15,13 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = 'example-game'
+
+include 'platforms:desktop'
+include 'platforms:android'
+include 'platforms:ios'
+
+project(':platforms:desktop').projectDir = file('platforms/desktop')
+project(':platforms:android').projectDir = file('platforms/android')
+project(':platforms:ios').projectDir = file('platforms/ios')
+
 includeBuild('../rollercoaster')

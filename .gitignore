@@ -19,8 +19,7 @@ local.properties
 .cxx/
 
 ## iOS / RoboVM
-ios/build/
-ios/robovm-build/
+platforms/ios/robovm-build/
 xcuserdata/
 *.xcuserstate
 DerivedData/

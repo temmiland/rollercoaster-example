@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:${libs.versions.robovm.get()}"
+    }
+}
+
+apply plugin: 'robovm'
+apply plugin: 'java'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation project(':')
+    implementation libs.gdx.backend.robovm
+    implementation libs.robovm.rt
+    implementation libs.robovm.cocoatouch
+}
+
+robovm {
+    archs = 'x86_64'
+    iosSkipSigning = true
+}
