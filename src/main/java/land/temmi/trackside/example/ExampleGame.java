@@ -26,6 +26,7 @@ import land.temmi.rollercoaster.render.LightingEnvironment;
 import land.temmi.rollercoaster.render.PointLightSource;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
+import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.actor.SpriteAnimation;
@@ -87,10 +88,7 @@ public class ExampleGame extends ApplicationAdapter {
         createPlayerSprite();
         player = new GridActor(map.tiles.getWidth(), map.tiles.getDepth(), 5f);
         MapEntity playerEntity = findPlayer(map);
-        player.setTileAccess(new GridActor.TileAccess() {
-            @Override public boolean canEnter(int x, int z) { return !map.tiles.isBlocked(x, z); }
-            @Override public float heightAt(int x, int z) { return map.tiles.getHeight(x, z); }
-        });
+        player.setTileAccess(new TerrainRules(map.tiles));
         player.setTile(playerEntity.x, playerEntity.z);
         input = new KeyboardInput();
     }

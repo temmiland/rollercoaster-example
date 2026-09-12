@@ -27,6 +27,7 @@ import land.temmi.trackside.example.ExampleMap;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.MapLoader;
+import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.world.TilePrototype;
 import land.temmi.rollercoaster.world.Tileset;
@@ -69,8 +70,7 @@ public final class RenderSmokeTest extends ExampleGame {
         land.temmi.rollercoaster.world.LoadedMap map = new MapLoader().load(
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
-            || !map.tiles.isBlocked(6, 8) || !map.tiles.isBlocked(10, 11)
-            || map.tiles.isBlocked(5, 8) || map.tiles.isBlocked(10, 12)
+            || map.tiles.isBlocked(6, 8) || map.tiles.isBlocked(10, 11)
             || map.props.size != 1 || map.entities.size != 1
             || map.props.first().elevation != 0f
             || !"player".equals(map.entities.first().type)
@@ -85,11 +85,7 @@ public final class RenderSmokeTest extends ExampleGame {
 
     /** Walks the actor up the ramp and checks the cliff beside it stays closed. */
     private void verifyTerrainSteps() {
-        land.temmi.rollercoaster.world.TileMap tiles = ExampleMap.getLoadedMap().tiles;
-        GridActor.TileAccess access = new GridActor.TileAccess() {
-            @Override public boolean canEnter(int x, int z) { return !tiles.isBlocked(x, z); }
-            @Override public float heightAt(int x, int z) { return tiles.getHeight(x, z); }
-        };
+        GridActor.TileAccess access = new TerrainRules(ExampleMap.getLoadedMap().tiles);
         if (!climbs(access, 18, 10) || !climbs(access, 18, 9)) {
             throw new AssertionError("Actor cannot walk up the ramp");
         }
@@ -133,6 +129,18 @@ public final class RenderSmokeTest extends ExampleGame {
             if (!visible.contains(scene.getInstances().peek(), true)) {
                 throw new AssertionError("House prop was culled at its own position");
             }
+            // The footprint is authored on the model, so placing the prop must block these tiles
+            // even though the map document marks nothing.
+            land.temmi.rollercoaster.world.TileMap tiles = scene.getMap().tiles;
+            if (!tiles.isBlocked(6, 8) || !tiles.isBlocked(10, 11) || !tiles.isBlocked(8, 10)
+                || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8) || tiles.isBlocked(10, 12)) {
+                throw new AssertionError("Model collision was not merged into the map collision");
+            }
+            int blocked = 0;
+            for (int z = 0; z < tiles.getDepth(); z++) {
+                for (int x = 0; x < tiles.getWidth(); x++) if (tiles.isBlocked(x, z)) blocked++;
+            }
+            if (blocked != 20) throw new AssertionError("Expected a 5x4 derived footprint, got " + blocked);
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
             if (!"gltf:models/house.gltf".equals(house.source)
                 || house.offsetX != -1f || house.offsetY != 0f || house.offsetZ != -1f

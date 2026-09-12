@@ -17,6 +17,7 @@ import land.temmi.rollercoaster.world.ChunkMesher;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapLoader;
 import land.temmi.rollercoaster.world.TilePrototype;
+import land.temmi.rollercoaster.world.TileShape;
 import land.temmi.rollercoaster.world.Tileset;
 import land.temmi.rollercoaster.world.WorldScene;
 
@@ -37,7 +38,7 @@ public final class ExampleMap {
             prototypes.add(path);
             TilePrototype plateau = ground(new Color(0.47f, 0.64f, 0.30f, 1f), 1.35f);
             prototypes.add(plateau);
-            TilePrototype ramp = ramp(new Color(0.70f, 0.60f, 0.40f, 1f), 1.35f);
+            TilePrototype ramp = rampNorth(new Color(0.70f, 0.60f, 0.40f, 1f), 1.35f);
             prototypes.add(ramp);
             Tileset tileset = new Tileset()
                 .add("grass", grass)
@@ -85,21 +86,21 @@ public final class ExampleMap {
     }
 
     private static TilePrototype ground(Color color, float thickness) {
-        return tile(color, thickness, new Matrix4());
+        return new TilePrototype(tileModel(color, thickness, new Matrix4()));
     }
 
     /**
      * Tile whose top surface climbs one level from its high edge (local z=0) to its low edge.
      * Built by shearing a flat tile, so every side face keeps its winding.
      */
-    private static TilePrototype ramp(Color color, float thickness) {
+    private static TilePrototype rampNorth(Color color, float thickness) {
         Matrix4 shear = new Matrix4();
         shear.val[Matrix4.M12] = -1f;  // y falls by one unit across the tile's depth
         shear.val[Matrix4.M13] = 0.5f; // centred, so the tile's layer height is its midpoint
-        return tile(color, thickness, shear);
+        return new TilePrototype(tileModel(color, thickness, shear), TileShape.RAMP_NORTH, true);
     }
 
-    private static TilePrototype tile(Color color, float thickness, Matrix4 vertexTransform) {
+    private static Model tileModel(Color color, float thickness, Matrix4 vertexTransform) {
         ModelBuilder builder = new ModelBuilder();
         builder.begin();
         MeshPartBuilder mesh = builder.part("ground", GL20.GL_TRIANGLES, ChunkMesher.ATTRIBUTES, new Material());
@@ -112,6 +113,6 @@ public final class ExampleMap {
         mesh.rect(1, -thickness, 1, 1, -thickness, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0);
         mesh.setColor(color);
         mesh.rect(0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0);
-        return new TilePrototype(builder.end());
+        return builder.end();
     }
 }
