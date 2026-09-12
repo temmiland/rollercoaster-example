@@ -91,9 +91,12 @@ public final class RenderSmokeTest extends ExampleGame {
                 }
                 previousX = animation.getFrame().getRegionX();
             }
+            animation.setFacing(Facing.SOUTH);
             animation.setMoving(true);
+            int firstWalkFrame = animation.getFrame().getRegionX();
             animation.update(0.15f);
-            if (animation.getFrame().getRegionWidth() != 16 || !animation.isMoving()) {
+            if (animation.getFrame().getRegionWidth() != 16 || !animation.isMoving()
+                || animation.getFrame().getRegionX() == firstWalkFrame) {
                 throw new AssertionError("Sprite walk animation did not advance");
             }
         } finally {
