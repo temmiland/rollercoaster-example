@@ -13,7 +13,8 @@ is entered, so crossing a threshold does not change the current map in the middl
 - `F3`: inspect time and whether lamps are currently active.
 
 The schedule is early morning from 05:00, day from 08:00, early evening from 17:00,
-and night from 20:00 until 05:00. Local lights and window emission are off during the day
+and night from 20:00 until 05:00. Early morning is red, day is close to neutral, and early
+evening mixes sunset red with blue ambient light. Local lights and window emission are off during the day
 and use a reduced fixed intensity in the other three situations, unless disabled with `L`.
 Night uses brighter cool ambient light and weak moonlight, so the scene remains visible. Local lights do not yet cast
 their own shadows; see the engine's `docs/lighting.md` for the current render contract.
