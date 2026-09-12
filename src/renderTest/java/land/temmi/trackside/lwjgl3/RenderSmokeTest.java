@@ -62,6 +62,7 @@ public final class RenderSmokeTest extends ExampleGame {
         }
         verifyChunks();
         verifyMapDocument();
+        verifyTerrainGrid();
         verifyTerrainSteps();
         verifyDepthAndTexture();
         verifySprites();
@@ -124,34 +125,83 @@ public final class RenderSmokeTest extends ExampleGame {
             || map.entities.first().x != 12 || map.entities.first().z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
         }
-        if (map.tiles.getHeight(18, 10) != 0f || map.tiles.getHeight(18, 9) != 1f
-            || map.tiles.getHeight(18, 8) != 2f || map.tiles.getHeight(6, 8) != 2f
-            || map.tiles.getHeight(4, 4) != 2f) {
+        if (map.tiles.getHeight(18, 11) != 0f || map.tiles.getHeight(18, 10) != 0.5f
+            || map.tiles.getHeight(18, 9) != 1.5f || map.tiles.getHeight(18, 8) != 2f
+            || map.tiles.getHeight(18, 2) != 0.5f || map.tiles.getHeight(18, 3) != 1.5f
+            || map.tiles.getHeight(6, 8) != 2f || map.tiles.getHeight(4, 4) != 2f) {
             throw new AssertionError("Raised plateaus and ramp heights did not load");
         }
-        if (map.tiles.getShape(4, 9) != TileShape.RAMP_NORTH
+        if (map.tiles.getShape(4, 10) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(4, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(18, 10) != TileShape.RAMP_NORTH
             || map.tiles.getShape(18, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(18, 2) != TileShape.RAMP_SOUTH
             || map.tiles.getShape(18, 3) != TileShape.RAMP_SOUTH
             || map.tiles.getShape(16, 9) != TileShape.FLAT) {
-            throw new AssertionError("Three-ramp shape layer did not load");
+            throw new AssertionError("One-level ramp shape layer did not load");
         }
     }
 
-    /** Walks the actor up the ramp and checks the cliff beside it stays closed. */
+    private static void verifyTerrainGrid() {
+        TileSurface ground = new TileSurface("ground");
+        try {
+            new land.temmi.rollercoaster.world.TileMap(1, 1)
+                .set(0, 0, ground, 0.5f, TileShape.FLAT, false);
+            throw new AssertionError("Flat terrain accepted a fractional height");
+        } catch (IllegalArgumentException expected) { }
+        try {
+            new land.temmi.rollercoaster.world.TileMap(1, 1)
+                .set(0, 0, ground, 1f, TileShape.RAMP_EAST, false);
+            throw new AssertionError("Ramp terrain accepted a non-midpoint height");
+        } catch (IllegalArgumentException expected) { }
+
+        land.temmi.rollercoaster.world.TileMap shortcut = new land.temmi.rollercoaster.world.TileMap(3, 1);
+        shortcut.set(0, 0, ground, 0f, TileShape.FLAT, false);
+        shortcut.set(1, 0, ground, 0.5f, TileShape.RAMP_EAST, false);
+        shortcut.set(2, 0, ground, 2f, TileShape.FLAT, false);
+        TerrainRules shortcutRules = new TerrainRules(shortcut);
+        if (shortcutRules.step(0, 0, 1, 0) != TerrainRules.Step.ALLOWED
+            || shortcutRules.step(1, 0, 1, 0) != TerrainRules.Step.TOO_STEEP) {
+            throw new AssertionError("One ramp can still skip a height level");
+        }
+
+        land.temmi.rollercoaster.world.TileMap chain = new land.temmi.rollercoaster.world.TileMap(4, 1);
+        chain.set(0, 0, ground, 0f, TileShape.FLAT, false);
+        chain.set(1, 0, ground, 0.5f, TileShape.RAMP_EAST, false);
+        chain.set(2, 0, ground, 1.5f, TileShape.RAMP_EAST, false);
+        chain.set(3, 0, ground, 2f, TileShape.FLAT, false);
+        TerrainRules chainRules = new TerrainRules(chain);
+        if (chainRules.step(0, 0, 1, 0) != TerrainRules.Step.ALLOWED
+            || chainRules.step(1, 0, 1, 0) != TerrainRules.Step.ALLOWED
+            || chainRules.step(2, 0, 1, 0) != TerrainRules.Step.ALLOWED) {
+            throw new AssertionError("Two one-level ramps do not connect the plateau");
+        }
+    }
+
+    /** Walks the actor across each one-level ramp and checks the cliff beside it stays closed. */
     private void verifyTerrainSteps() {
         land.temmi.rollercoaster.world.TileMap tiles = ExampleMap.getLoadedMap().tiles;
-        GridActor.TileAccess access = new TerrainRules(tiles);
-        if (!climbs(access, 4, 10) || !climbs(access, 4, 9)
-            || !climbs(access, 18, 10) || !climbs(access, 18, 9)
-            || !climbs(access, 18, 2) || !climbs(access, 18, 3)) {
-            throw new AssertionError("Actor cannot walk up all three ramps");
-        }
-        if (climbs(access, 17, 9) || climbs(access, 19, 9)) {
+        TerrainRules terrain = new TerrainRules(tiles);
+        GridActor.TileAccess access = terrain;
+        GridActor west = actorAt(access, 4, 11);
+        move(west, MoveIntent.UP, 4, 10, 0.5f);
+        move(west, MoveIntent.UP, 4, 9, 1.5f);
+        move(west, MoveIntent.UP, 4, 8, 2f);
+        GridActor eastSouth = actorAt(access, 18, 11);
+        move(eastSouth, MoveIntent.UP, 18, 10, 0.5f);
+        move(eastSouth, MoveIntent.UP, 18, 9, 1.5f);
+        move(eastSouth, MoveIntent.UP, 18, 8, 2f);
+        GridActor eastNorth = actorAt(access, 18, 1);
+        move(eastNorth, MoveIntent.DOWN, 18, 2, 0.5f);
+        move(eastNorth, MoveIntent.DOWN, 18, 3, 1.5f);
+        move(eastNorth, MoveIntent.DOWN, 18, 4, 2f);
+        if (terrain.step(17, 9, 1, 0) != TerrainRules.Step.TOO_STEEP
+            || terrain.step(19, 9, -1, 0) != TerrainRules.Step.TOO_STEEP) {
             throw new AssertionError("Actor can climb the cliff instead of using the ramp");
         }
         for (int x = 9; x <= 15; x++) {
             if (!tiles.hasWalkableSurface(x, 6) || tiles.isBlocked(x, 6)
-                || Math.abs(tiles.getWalkableSurfaceHeight(x, 6) - 2.12f) > 1e-5f) {
+                || Math.abs(tiles.getWalkableSurfaceHeight(x, 6) - 2f) > 1e-5f) {
                 throw new AssertionError("Bridge deck is not a raised walkable surface at " + x + ",6");
             }
         }
@@ -164,12 +214,16 @@ public final class RenderSmokeTest extends ExampleGame {
             }
         }
         GridActor actor = actorAt(access, 8, 6);
+        if (terrain.step(8, 6, 1, 0) != TerrainRules.Step.ALLOWED) {
+            throw new AssertionError("Plateau does not meet the bridge: " + terrain.step(8, 6, 1, 0));
+        }
         for (int x = 9; x <= 16; x++) {
             actor.update(0f, MoveIntent.RIGHT);
             actor.update(1f, MoveIntent.RIGHT);
-            float expected = x == 16 ? 2f : 2.12f;
+            float expected = 2f;
             if (actor.getTileX() != x || Math.abs(actor.getPosition().y - expected) > 1e-5f) {
-                throw new AssertionError("Actor cannot cross bridge at tile " + x + ": " + actor.getPosition().y);
+                throw new AssertionError("Actor cannot cross bridge at tile " + x + ": "
+                    + actor.getTileX() + "," + actor.getTileZ() + " at " + actor.getPosition().y);
             }
         }
     }
@@ -181,10 +235,13 @@ public final class RenderSmokeTest extends ExampleGame {
         return actor;
     }
 
-    private static boolean climbs(GridActor.TileAccess access, int x, int z) {
-        GridActor actor = actorAt(access, x, z);
-        actor.update(0.001f, MoveIntent.UP);
-        return actor.isMoving();
+    private static void move(GridActor actor, MoveIntent intent, int x, int z, float height) {
+        actor.update(0f, intent);
+        actor.update(1f, intent);
+        if (actor.getTileX() != x || actor.getTileZ() != z
+            || Math.abs(actor.getPosition().y - height) > 1e-5f) {
+            throw new AssertionError("Actor missed terrain step " + x + "," + z + ": " + actor.getPosition().y);
+        }
     }
 
     private void verifyChunks() {
@@ -252,7 +309,7 @@ public final class RenderSmokeTest extends ExampleGame {
             }
             ModelDefinition bridge = ExampleMap.getModelCatalog().definition("suspensionBridge");
             if (!"gltf:models/suspension-bridge.gltf".equals(bridge.source)
-                || bridge.offsetX != 0f || bridge.offsetY != 0f || bridge.offsetZ != 0f
+                || bridge.offsetX != 0f || bridge.offsetY != -0.12f || bridge.offsetZ != 0f
                 || bridge.scale != 1f || bridge.height != 3.04f
                 || bridge.boundsMinX != -3.5f || bridge.boundsMinY != 0f || bridge.boundsMinZ != -0.45f
                 || bridge.boundsMaxX != 3.5f || bridge.boundsMaxY != 3.04f || bridge.boundsMaxZ != 0.45f
