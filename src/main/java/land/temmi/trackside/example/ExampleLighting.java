@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import land.temmi.rollercoaster.render.LightingSituation;
 import land.temmi.rollercoaster.render.LightingEnvironment;
 import land.temmi.rollercoaster.render.PointLightSource;
 import land.temmi.rollercoaster.world.WorldScene;
@@ -25,6 +26,7 @@ public final class ExampleLighting implements Disposable {
     private final Color warm = new Color(1f, 0.82f, 0.56f, 1f);
     private boolean enabled = true;
     private final Array<Float> intensities = new Array<>();
+    private LightingSituation situation = LightingSituation.DAY;
 
     public ExampleLighting(LightingEnvironment environment, WorldScene scene) {
         this.environment = environment;
@@ -71,16 +73,18 @@ public final class ExampleLighting implements Disposable {
 
     public void toggle() {
         enabled = !enabled;
-        update();
+        update(situation);
     }
 
-    public void update() {
-        float night = 1f - Math.min(1f, environment.getSunIntensity() / 0.95f);
+    public void update(LightingSituation situation) {
+        if (situation == null) throw new IllegalArgumentException("Lighting situation is required");
+        this.situation = situation;
+        float localFactor = situation.getLocalLightFactor();
         for (int i = 0; i < lights.size; i++) {
-            lights.get(i).enabled = enabled && night > 0f;
-            lights.get(i).intensity = intensities.get(i) * night;
+            lights.get(i).enabled = enabled && localFactor > 0f;
+            lights.get(i).intensity = intensities.get(i) * localFactor;
         }
-        for (ColorAttribute glow : emission) glow.color.set(warm).mul(enabled ? night : 0f);
+        for (ColorAttribute glow : emission) glow.color.set(warm).mul(enabled ? localFactor : 0f);
     }
 
     boolean isEnabled() { return lights.size > 0 && lights.first().enabled; }

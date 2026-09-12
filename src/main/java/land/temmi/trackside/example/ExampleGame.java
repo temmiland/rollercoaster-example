@@ -75,7 +75,7 @@ public class ExampleGame extends ApplicationAdapter {
         shapes = new ShapeRenderer();
 
         lighting = new LightingEnvironment();
-        dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f);
+        dayNightCycle = new DayNightCycle(lighting).setSecondsPerDay(90f).enterMap();
         shadowMap = new DirectionalShadowMap(lighting).setWorldSize(32f);
         modelBatch = new ModelBatch(new WorldShaderProvider(lighting, shadowMap));
         worldScene = ExampleMap.createScene();
@@ -118,12 +118,13 @@ public class ExampleGame extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
             exampleLighting.toggle();
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.K)) dayNightCycle.cycleSituation();
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) dayNightCycle.setPaused(!dayNightCycle.isPaused());
         if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
             dayNightCycle.setTimeOfDay((dayNightCycle.getTimeOfDay() + 1f) % 24f);
         }
         dayNightCycle.update(delta);
-        exampleLighting.update();
+        exampleLighting.update(dayNightCycle.getSituation());
         player.update(delta, input.pollMove());
         playerAnimation.setPlaying(player.isMoving());
         playerAnimation.update(delta);
@@ -158,7 +159,7 @@ public class ExampleGame extends ApplicationAdapter {
     }
 
     protected void setDemoTime(float hours) {
-        dayNightCycle.setTimeOfDay(hours).setPaused(true);
+        dayNightCycle.setTimeOfDay(hours).enterMap().setPaused(true);
     }
 
     // Pixmap rows run top-down and the billboard maps its top edge to the first row,
@@ -209,6 +210,9 @@ public class ExampleGame extends ApplicationAdapter {
             + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
             + "," + subjectFootPosition.z + "\n"
             + "time " + String.format(java.util.Locale.ROOT, "%.1fh", dayNightCycle.getTimeOfDay())
+            + "  " + dayNightCycle.getSituation().getDisplayName()
+            + (dayNightCycle.getPendingSituation() == dayNightCycle.getSituation() ? "" :
+                " -> " + dayNightCycle.getPendingSituation().getDisplayName())
             + "  lamps " + (exampleLighting.isEnabled() ? "on" : "off") + "\n"
             + "camera fov " + pixelCamera.getFovDegrees()
             + " pitch " + pixelCamera.getPitchDegrees()

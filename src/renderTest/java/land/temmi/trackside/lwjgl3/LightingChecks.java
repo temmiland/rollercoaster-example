@@ -71,24 +71,42 @@ final class LightingChecks {
         DayNightCycle clock = new DayNightCycle(environment);
         ExampleLighting demo = new ExampleLighting(environment, scene);
         try {
-            for (float hour : new float[] {12, 22, 12}) {
-                clock.setTimeOfDay(hour); demo.update();
-                boolean active = hour == 22;
+            float[] hours = {6f, 12f, 18f, 22f};
+            LightingSituation[] situations = {
+                LightingSituation.EARLY_MORNING,
+                LightingSituation.DAY,
+                LightingSituation.EARLY_EVENING,
+                LightingSituation.NIGHT
+            };
+            for (int i = 0; i < hours.length; i++) {
+                LightingSituation before = clock.getSituation();
+                clock.setTimeOfDay(hours[i]);
+                if (clock.getSituation() != before) {
+                    throw new AssertionError("Clock changed lighting before map entry: " + hours[i]);
+                }
+                clock.enterMap();
+                demo.update(clock.getSituation());
+                boolean active = situations[i].getLocalLightFactor() > 0f;
                 if (environment.getPointLights().size != 4) throw new AssertionError("Expected two window and two street lights");
                 for (PointLightSource lamp : environment.getPointLights()) {
-                    if (lamp.enabled != active || (lamp.intensity > 0) != active) throw new AssertionError("Lights active at wrong time: " + hour);
+                    if (lamp.enabled != active || (lamp.intensity > 0) != active) throw new AssertionError("Lights active at wrong time: " + hours[i]);
                 }
                 for (ModelInstance instance : scene.getInstances()) for (Material material : instance.materials) {
                     if (!"windows".equals(material.id)) continue;
                     ColorAttribute glow = (ColorAttribute) material.get(ColorAttribute.Emissive);
-                    if (glow == null || (glow.color.r > 0) != active) throw new AssertionError("Window emission at wrong time: " + hour);
+                    if (glow == null || (glow.color.r > 0) != active) throw new AssertionError("Window emission at wrong time: " + hours[i]);
                 }
             }
-            demo.toggle(); clock.setTimeOfDay(22); demo.update();
+            demo.toggle(); clock.setTimeOfDay(22).enterMap(); demo.update(clock.getSituation());
             for (PointLightSource lamp : environment.getPointLights()) {
                 if (lamp.enabled) throw new AssertionError("Manual off was lost at night");
             }
-            System.out.println("PASS: daytime lights and windows off, nighttime on, manual off preserved");
+            clock.setTimeOfDay(12).enterMap();
+            clock.cycleSituation();
+            if (clock.getSituation() != LightingSituation.EARLY_EVENING) {
+                throw new AssertionError("Situation cycle did not advance from day");
+            }
+            System.out.println("PASS: four fixed situations, map-entry switching, manual off preserved");
         } finally { demo.dispose(); scene.dispose(); }
     }
 
