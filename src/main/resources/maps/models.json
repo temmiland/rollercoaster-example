@@ -18,6 +18,17 @@
       "height": 2.9,
       "bounds": { "min": [-0.2, 0, -0.2], "max": [0.2, 2.9, 0.2] },
       "collision": { "min": [0, 0], "max": [0, 0] }
+    },
+    {
+      "id": "suspensionBridge",
+      "source": "gltf:models/suspension-bridge.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 3.04,
+      "bounds": { "min": [-3.5, 0, -0.45], "max": [3.5, 3.04, 0.45] },
+      "collision": { "min": [-2, 1], "max": [4, 1] },
+      "walkable": true,
+      "walkHeight": 2.12
     }
   ]
 }

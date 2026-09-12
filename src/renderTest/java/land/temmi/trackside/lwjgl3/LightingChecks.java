@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import land.temmi.rollercoaster.render.*;
+import land.temmi.rollercoaster.world.MapProp;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.trackside.example.ExampleMap;
 import land.temmi.trackside.example.ExampleLighting;
@@ -145,7 +146,10 @@ final class LightingChecks {
             for (boolean terrain : new boolean[] {false, true}) {
                 casters.clear();
                 for (ModelInstance instance : scene.getInstances()) {
-                    if ((instance == scene.getInstances().peek()) != terrain) casters.add(instance);
+                    boolean isTerrain = instance.userData == WorldScene.TERRAIN_TAG;
+                    boolean isHouse = instance.userData instanceof MapProp
+                        && "house".equals(((MapProp) instance.userData).model);
+                    if (terrain ? isTerrain : isHouse) casters.add(instance);
                 }
                 shadows.render(new Vector3(11, 0, 11), casters);
                 shadows.setStrength(0);

@@ -18,9 +18,9 @@ import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.world.WorldSceneLoader;
 
 /**
- * Example world: a path cross, a plateau reached by a walkable ramp, a ramp that is scenery only,
- * and a house. Tile types carry nothing but colour and walkability — heights, shapes and all
- * geometry come from the map document through {@link ChunkMesher}.
+ * Example world: a path cross, two raised plateaus with three ramps, a walkable bridge, and a
+ * house. Tile types carry nothing but colour and walkability — heights, shapes and all geometry
+ * come from the map document through {@link ChunkMesher}.
  */
 public final class ExampleMap {
     private static final float SIDE_TINT = 0.72f;

@@ -114,48 +114,63 @@ public final class RenderSmokeTest extends ExampleGame {
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
             || map.tiles.isBlocked(6, 8) || map.tiles.isBlocked(10, 11)
-            || map.props.size != 3 || map.entities.size != 1
+            || map.props.size != 4 || map.entities.size != 1
             || map.props.first().elevation != 0f
             || !"streetLamp".equals(map.props.get(1).model) || map.props.get(1).x != 10.8f
-            || map.props.get(1).z != 13f || map.props.get(2).z != 5f
+            || map.props.get(1).z != 13f || map.props.get(2).z != 3f
+            || !"suspensionBridge".equals(map.props.get(3).model)
+            || map.props.get(3).x != 11.5f || map.props.get(3).z != 5.5f
             || !"player".equals(map.entities.first().type)
             || map.entities.first().x != 12 || map.entities.first().z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
         }
-        if (map.tiles.getHeight(18, 10) != 0f || map.tiles.getHeight(18, 9) != 0.5f
-            || map.tiles.getHeight(18, 8) != 1f || map.tiles.getHeight(17, 9) != 0f) {
-            throw new AssertionError("Ramp does not bridge flat ground and the plateau");
+        if (map.tiles.getHeight(18, 10) != 0f || map.tiles.getHeight(18, 9) != 1f
+            || map.tiles.getHeight(18, 8) != 2f || map.tiles.getHeight(6, 8) != 2f
+            || map.tiles.getHeight(4, 4) != 2f) {
+            throw new AssertionError("Raised plateaus and ramp heights did not load");
         }
-        if (map.tiles.getShape(18, 9) != TileShape.RAMP_NORTH
-            || map.tiles.getShape(16, 9) != TileShape.RAMP_NORTH
-            || map.tiles.getShape(18, 10) != TileShape.FLAT) {
-            throw new AssertionError("Shape layer did not load");
+        if (map.tiles.getShape(4, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(18, 9) != TileShape.RAMP_NORTH
+            || map.tiles.getShape(18, 3) != TileShape.RAMP_SOUTH
+            || map.tiles.getShape(16, 9) != TileShape.FLAT) {
+            throw new AssertionError("Three-ramp shape layer did not load");
         }
     }
 
     /** Walks the actor up the ramp and checks the cliff beside it stays closed. */
     private void verifyTerrainSteps() {
         land.temmi.rollercoaster.world.TileMap tiles = ExampleMap.getLoadedMap().tiles;
-        // Walkability rides on the tile type, shape on the map - the two ramps share a shape
-        // and differ only in which tile type they use.
-        if (tiles.isWalkable(16, 9) || !tiles.isWalkable(18, 9)) {
-            throw new AssertionError("Ramp walkability does not come from the tile type");
-        }
         GridActor.TileAccess access = new TerrainRules(tiles);
-        if (!climbs(access, 18, 10) || !climbs(access, 18, 9)) {
-            throw new AssertionError("Actor cannot walk up the ramp");
+        if (!climbs(access, 4, 10) || !climbs(access, 4, 9)
+            || !climbs(access, 18, 10) || !climbs(access, 18, 9)
+            || !climbs(access, 18, 2) || !climbs(access, 18, 3)) {
+            throw new AssertionError("Actor cannot walk up all three ramps");
         }
         if (climbs(access, 17, 9) || climbs(access, 19, 9)) {
             throw new AssertionError("Actor can climb the cliff instead of using the ramp");
         }
-        if (climbs(access, 16, 10)) {
-            throw new AssertionError("Actor can step onto a ramp that is scenery only");
+        for (int x = 9; x <= 15; x++) {
+            if (!tiles.hasWalkableSurface(x, 6) || tiles.isBlocked(x, 6)
+                || Math.abs(tiles.getWalkableSurfaceHeight(x, 6) - 2.12f) > 1e-5f) {
+                throw new AssertionError("Bridge deck is not a raised walkable surface at " + x + ",6");
+            }
         }
-        GridActor actor = actorAt(access, 18, 10);
-        actor.update(0f, MoveIntent.UP);
-        actor.update(1f, MoveIntent.UP);
-        if (Math.abs(actor.getPosition().y - 0.5f) > 1e-5f) {
-            throw new AssertionError("Actor does not stand on the ramp surface: " + actor.getPosition().y);
+        GridActor underpass = actorAt(access, 11, 10);
+        for (int z = 9; z >= 6; z--) {
+            underpass.update(0f, MoveIntent.UP);
+            underpass.update(1f, MoveIntent.UP);
+            if (underpass.getTileZ() != z || Math.abs(underpass.getPosition().y) > 1e-5f) {
+                throw new AssertionError("Actor cannot pass below bridge at tile 11," + z);
+            }
+        }
+        GridActor actor = actorAt(access, 8, 6);
+        for (int x = 9; x <= 16; x++) {
+            actor.update(0f, MoveIntent.RIGHT);
+            actor.update(1f, MoveIntent.RIGHT);
+            float expected = x == 16 ? 2f : 2.12f;
+            if (actor.getTileX() != x || Math.abs(actor.getPosition().y - expected) > 1e-5f) {
+                throw new AssertionError("Actor cannot cross bridge at tile " + x + ": " + actor.getPosition().y);
+            }
         }
     }
 
@@ -180,8 +195,8 @@ public final class RenderSmokeTest extends ExampleGame {
             Array<Model> chunks = new Array<>();
             for (Model chunk : sceneChunks(scene)) chunks.add(chunk);
             if (chunks.size != 4) throw new AssertionError("Expected four chunks");
-            if (scene.getInstances().size != 7) {
-                throw new AssertionError("Expected four chunk instances, house, and two lamps");
+            if (scene.getInstances().size != 8) {
+                throw new AssertionError("Expected four chunk instances, house, two lamps, and bridge");
             }
             Array<ModelInstance> visible = new Array<>();
             scene.getVisibleInstances(housePeekCamera(), visible);
@@ -199,13 +214,16 @@ public final class RenderSmokeTest extends ExampleGame {
             // even though the map document marks nothing.
             land.temmi.rollercoaster.world.TileMap tiles = scene.getMap().tiles;
             if (!tiles.isBlocked(6, 8) || !tiles.isBlocked(10, 11) || !tiles.isBlocked(8, 10)
-                || !tiles.isBlocked(10, 5) || !tiles.isBlocked(10, 13)
-                || tiles.isBlocked(9, 5) || tiles.isBlocked(11, 5)
-                || tiles.isBlocked(10, 4) || tiles.isBlocked(10, 6)
+                || !tiles.isBlocked(10, 3) || !tiles.isBlocked(10, 13)
+                || tiles.isBlocked(9, 3) || tiles.isBlocked(11, 3)
+                || tiles.isBlocked(10, 2) || tiles.isBlocked(10, 4)
                 || tiles.isBlocked(9, 13) || tiles.isBlocked(11, 13)
                 || tiles.isBlocked(10, 12) || tiles.isBlocked(10, 14)
                 || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8)) {
                 throw new AssertionError("Model collision was not merged into the map collision");
+            }
+            for (int x = 9; x <= 15; x++) if (tiles.isBlocked(x, 6) || !tiles.hasWalkableSurface(x, 6)) {
+                throw new AssertionError("Bridge collision footprint is not walkable");
             }
             int blocked = 0;
             for (int z = 0; z < tiles.getDepth(); z++) {
@@ -231,6 +249,17 @@ public final class RenderSmokeTest extends ExampleGame {
                 || lamp.collisionMinX != 0 || lamp.collisionMaxX != 0
                 || lamp.collisionMinZ != 0 || lamp.collisionMaxZ != 0) {
                 throw new AssertionError("Model manifest did not load street lamp metadata");
+            }
+            ModelDefinition bridge = ExampleMap.getModelCatalog().definition("suspensionBridge");
+            if (!"gltf:models/suspension-bridge.gltf".equals(bridge.source)
+                || bridge.offsetX != 0f || bridge.offsetY != 0f || bridge.offsetZ != 0f
+                || bridge.scale != 1f || bridge.height != 3.04f
+                || bridge.boundsMinX != -3.5f || bridge.boundsMinY != 0f || bridge.boundsMinZ != -0.45f
+                || bridge.boundsMaxX != 3.5f || bridge.boundsMaxY != 3.04f || bridge.boundsMaxZ != 0.45f
+                || bridge.collisionMinX != -2 || bridge.collisionMaxX != 4
+                || bridge.collisionMinZ != 1 || bridge.collisionMaxZ != 1
+                || !bridge.walkable || bridge.walkHeight != 2.12f) {
+                throw new AssertionError("Model manifest did not load bridge metadata");
             }
             for (Model chunk : chunks) {
                 if (chunk.meshes.size != 1 || chunk.meshParts.size != 1 || chunk.materials.size != 1) {
