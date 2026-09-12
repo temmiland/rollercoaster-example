@@ -4,7 +4,7 @@
   "sprites": [
     {
       "id": "player",
-      "height": 1.8,
+      "height": 1,
       "frameDuration": 0.14,
       "directions": {
         "north": { "idle": "player_north_idle", "walk": ["player_north_walk_a", "player_north_walk_b"] },

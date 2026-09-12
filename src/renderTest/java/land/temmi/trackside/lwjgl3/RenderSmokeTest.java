@@ -75,7 +75,7 @@ public final class RenderSmokeTest extends ExampleGame {
         SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
         SpriteDefinition definition = manifest.sprite("player");
         if (!"sprites/player.atlas".equals(manifest.atlas)
-            || definition.worldHeight != 1.8f || definition.frameDuration != 0.14f) {
+            || definition.worldHeight != 1f || definition.frameDuration != 0.14f) {
             throw new AssertionError("Sprite manifest metadata did not load");
         }
         SpriteAtlas atlas = new SpriteAtlas(manifest.atlas);

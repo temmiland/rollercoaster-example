@@ -3,6 +3,9 @@
 Das Example Game lädt Figuren aus `src/main/resources/sprites/player.json`. Das Manifest ist
 versioniert und verweist auf einen TexturePacker-Atlas. Jede Figur definiert eine Welt-Höhe, die
 Frame-Dauer sowie `idle` und `walk` je `north`, `east`, `south` und `west`.
+Der Beispielspieler hat die Welt-Höhe `1` und entspricht damit genau einer Terrain-Höhenebene.
+Die Kamera ist auf eine Terrainstufe kalibriert, nicht auf die Höhe der aktuell gefolgten Figur;
+größere oder kleinere NPC-Sprites verändern daher weder Zoom noch sichtbaren Kartenausschnitt.
 
 ```json
 {
@@ -10,7 +13,7 @@ Frame-Dauer sowie `idle` und `walk` je `north`, `east`, `south` und `west`.
   "atlas": "sprites/player.atlas",
   "sprites": [{
     "id": "player",
-    "height": 1.8,
+    "height": 1,
     "frameDuration": 0.14,
     "directions": {
       "south": { "idle": "player_south_idle", "walk": ["player_south_walk_a", "player_south_walk_b"] }

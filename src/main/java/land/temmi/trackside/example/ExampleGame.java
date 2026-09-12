@@ -27,6 +27,7 @@ import land.temmi.rollercoaster.asset.SpriteManifest;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.MapEntity;
 import land.temmi.rollercoaster.world.TerrainRules;
+import land.temmi.rollercoaster.world.TileMap;
 import land.temmi.rollercoaster.world.WorldScene;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
@@ -37,7 +38,7 @@ import land.temmi.rollercoaster.input.TouchInput;
 
 public class ExampleGame extends ApplicationAdapter {
 
-    private static final float SUBJECT_PIXEL_HEIGHT = 48f;
+    private static final float TERRAIN_LEVEL_PIXEL_HEIGHT = 27f;
 
     private LowResTarget lowRes;
     private PixelCamera pixelCamera;
@@ -132,7 +133,7 @@ public class ExampleGame extends ApplicationAdapter {
         playerSprite.setRegion(playerAnimation.getFrame());
         subjectFootPosition.set(player.getPosition());
 
-        pixelCamera.follow(subjectFootPosition, subjectWorldHeight, SUBJECT_PIXEL_HEIGHT);
+        pixelCamera.follow(subjectFootPosition, TileMap.LEVEL_HEIGHT, TERRAIN_LEVEL_PIXEL_HEIGHT);
         pixelCamera.snapToPixelGrid(lowRes.getWidth(), lowRes.getHeight());
 
         playerSprite.setPosition(subjectFootPosition);
@@ -168,8 +169,7 @@ public class ExampleGame extends ApplicationAdapter {
         throw new IllegalArgumentException("Map has no player entity");
     }
 
-    // Horizontal ticks every 10px (brighter every 50px), so a screenshot's rendered
-    // subject height can be measured against SUBJECT_PIXEL_HEIGHT.
+    // Horizontal ticks every 10px (brighter every 50px) reveal the terrain-level scale.
     private void drawPixelRuler() {
         int width = lowRes.getWidth();
         int height = lowRes.getHeight();
