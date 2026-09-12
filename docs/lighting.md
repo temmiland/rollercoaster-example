@@ -14,8 +14,8 @@ is entered, so crossing a threshold does not change the current map in the middl
 
 The schedule is early morning from 05:00, day from 08:00, early evening from 17:00,
 and night from 20:00 until 05:00. Early morning is red, day is close to neutral, and early
-evening mixes sunset red with blue ambient light. Local lights and window emission are off during the day
-and use a reduced fixed intensity in the other three situations, unless disabled with `L`.
+evening mixes sunset red with blue ambient light. Local lights and window emission are off during
+early morning and day, then use a reduced fixed intensity in the evening and at night, unless disabled with `L`.
 Window geometry keeps its blue daytime colour and receives the same amber tint as its glow when
 the local lights are active. The visible emission is boosted separately from the point-light
 intensity, so the glow is stronger without increasing its illuminated radius.
