@@ -14,7 +14,7 @@ import land.temmi.rollercoaster.world.MapProp;
 import land.temmi.rollercoaster.world.WorldScene;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
-/** Window emission and street lamps placed in the example scene. */
+/** Controls window emission and lights attached to street-lamp props. */
 public final class ExampleLighting implements Disposable {
     private static final float EMISSION_BOOST = 2f;
     private final Array<PointLightSource> lights = new Array<>();
