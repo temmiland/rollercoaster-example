@@ -1,7 +1,7 @@
 {
   "version": 1,
   "name": "zerrwelt",
-  "seamArc": 0.9,
+  "crossingArc": 0.9,
   "planes": [
     {
       "name": "boden",
@@ -198,7 +198,7 @@
       ]
     }
   ],
-  "seams": [
+  "crossings": [
     {
       "from": [0, 0, 0],
       "fromInput": "left",

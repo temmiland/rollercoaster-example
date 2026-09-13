@@ -3,27 +3,27 @@ package land.temmi.trackside.example;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
-import land.temmi.rollercoaster.world.SurfaceRoom;
-import land.temmi.rollercoaster.world.SurfaceRoomLoader;
+import land.temmi.rollercoaster.world.FoldedMap;
+import land.temmi.rollercoaster.world.FoldedMapLoader;
 import land.temmi.rollercoaster.world.TileSurface;
 import land.temmi.rollercoaster.world.Tileset;
 
 /** The cave map: four slabs folded into a loop, authored in {@code maps/distortion.json}. */
-final class DistortionMap {
+final class DistortionCave {
     static final String PATH = "maps/distortion.json";
 
     private static final Color RIM = Color.valueOf("4f7bff");
     private static final Color ROCK = Color.valueOf("c98a86");
     private static final Color FLANK = Color.valueOf("221d33");
 
-    final SurfaceRoom room;
+    final FoldedMap map;
     private final Vector3 spawn = new Vector3();
     private final Vector3 exit = new Vector3();
 
-    DistortionMap() {
-        room = new SurfaceRoomLoader().load(Gdx.files.classpath(PATH), createTileset());
-        require(room.entityTile("player", spawn), "player");
-        require(room.entityTile("exit", exit), "exit");
+    DistortionCave() {
+        map = new FoldedMapLoader().load(Gdx.files.classpath(PATH), createTileset());
+        require(map.entityTile("player", spawn), "player");
+        require(map.entityTile("exit", exit), "exit");
     }
 
     /** Where the cave drops the player in. */

@@ -20,20 +20,20 @@ import land.temmi.rollercoaster.render.LightingEnvironment;
 import land.temmi.rollercoaster.render.LowResTarget;
 import land.temmi.rollercoaster.render.PixelCamera;
 import land.temmi.rollercoaster.render.PointLightSource;
-import land.temmi.rollercoaster.render.SurfaceCamera;
+import land.temmi.rollercoaster.render.PlaneCamera;
 import land.temmi.rollercoaster.world.GravityState;
-import land.temmi.rollercoaster.world.SurfacePlatform;
-import land.temmi.rollercoaster.world.SurfaceRoomScene;
+import land.temmi.rollercoaster.world.MapPlane;
+import land.temmi.rollercoaster.world.FoldedMapScene;
 import land.temmi.rollercoaster.world.TileMap;
 
-/** Cave room where the walking plane can turn. Drawn with the ordinary field renderer. */
+/** The cave, whose walking plane can turn. Drawn with the ordinary field renderer. */
 final class DistortionScreen implements Disposable {
     private static final float TERRAIN_LEVEL_PIXEL_HEIGHT = 48f;
     private static final float SLAB_THICKNESS = 1.4f;
     private static final Color VOID_COLOR = new Color(0.10f, 0.16f, 0.55f, 1f);
     private static final Color CAVE_AMBIENT = new Color(0.86f, 0.88f, 1f, 1f);
 
-    private final DistortionMap map;
+    private final DistortionCave cave;
     private final LowResTarget target;
     private final PixelCamera camera;
     private final ModelBatch batch;
@@ -44,8 +44,8 @@ final class DistortionScreen implements Disposable {
     private final InputSource input;
     private final LightingEnvironment lighting;
     private final DirectionalShadowMap shadowMap;
-    private final SurfaceRoomScene scene;
-    private final SurfaceCamera surfaceCamera = new SurfaceCamera();
+    private final FoldedMapScene scene;
+    private final PlaneCamera planeCamera = new PlaneCamera();
     private final Array<ModelInstance> visible = new Array<>();
     private final Array<ModelInstance> noCasters = new Array<>();
     private final Vector3 direction = new Vector3();
@@ -57,19 +57,19 @@ final class DistortionScreen implements Disposable {
     private final Vector3 exitTile = new Vector3();
     private boolean finished;
 
-    DistortionScreen(DistortionMap map, LowResTarget target, PixelCamera camera, ModelBatch batch,
+    DistortionScreen(DistortionCave cave, LowResTarget target, PixelCamera camera, ModelBatch batch,
                      SpriteBatch blit, BillboardRenderer sprite, DirectionalSpriteAnimation animation,
                      GridActor player, InputSource input, LightingEnvironment lighting,
                      DirectionalShadowMap shadowMap) {
-        this.map = map; this.target = target; this.camera = camera; this.batch = batch;
+        this.cave = cave; this.target = target; this.camera = camera; this.batch = batch;
         this.blit = blit; this.sprite = sprite; this.animation = animation; this.player = player;
         this.input = input; this.lighting = lighting; this.shadowMap = shadowMap;
-        scene = new SurfaceRoomScene(map.room, new Material(), ExampleMap.getModelCatalog(), SLAB_THICKNESS);
-        map.exitTile(exitTile);
+        scene = new FoldedMapScene(cave.map, new Material(), ExampleMap.getModelCatalog(), SLAB_THICKNESS);
+        cave.exitTile(exitTile);
 
-        surfaceCamera.setPitch(camera.getPitchDegrees());
-        player.setMovementSpace(map.room);
-        Vector3 spawn = map.spawnTile(new Vector3());
+        planeCamera.setPitch(camera.getPitchDegrees());
+        player.setMovementSpace(cave.map);
+        Vector3 spawn = cave.spawnTile(new Vector3());
         player.setGridTile((int) spawn.x, (int) spawn.y, (int) spawn.z);
         applyPlane(true);
     }
@@ -78,8 +78,8 @@ final class DistortionScreen implements Disposable {
 
     /** Plane the player currently stands on. */
     GravityState gravity() {
-        SurfacePlatform platform = map.room.platformAt(player.getTileX(), player.getTileY(), player.getTileZ());
-        return platform == null ? null : platform.gravity;
+        MapPlane plane = cave.map.planeAt(player.getTileX(), player.getTileY(), player.getTileZ());
+        return plane == null ? null : plane.gravity;
     }
 
     void render(float delta) {
@@ -90,15 +90,15 @@ final class DistortionScreen implements Disposable {
         if (player.didStep()) applyPlane(false);
         if (!player.isMoving() && onExitTile()) { finished = true; return; }
 
-        surfaceCamera.update(delta);
-        surfaceCamera.direction(direction);
-        surfaceCamera.up(up);
+        planeCamera.update(delta);
+        planeCamera.direction(direction);
+        planeCamera.up(up);
 
         animation.setFacing(player.getFacing());
         animation.setMoving(player.isMoving());
         animation.update(Math.max(0f, delta));
         sprite.setRegion(animation.getFrame());
-        surfaceCamera.spriteBasis(spriteRight, spriteUp);
+        planeCamera.spriteBasis(spriteRight, spriteUp);
         sprite.setBasis(spriteRight, spriteUp);
         sprite.setPosition(player.getPosition());
 
@@ -120,12 +120,12 @@ final class DistortionScreen implements Disposable {
 
     /** Points the camera at the plane the player now stands on. */
     private void applyPlane(boolean snap) {
-        SurfacePlatform platform = map.room.platformAt(player.getTileX(), player.getTileY(), player.getTileZ());
-        if (platform == null) return;
-        platform.gravity.normal(normal);
-        platform.gravity.right(planeRight);
-        if (snap) surfaceCamera.snapTo(normal, planeRight);
-        else surfaceCamera.blendTo(normal, planeRight);
+        MapPlane plane = cave.map.planeAt(player.getTileX(), player.getTileY(), player.getTileZ());
+        if (plane == null) return;
+        plane.gravity.normal(normal);
+        plane.gravity.right(planeRight);
+        if (snap) planeCamera.snapTo(normal, planeRight);
+        else planeCamera.blendTo(normal, planeRight);
     }
 
     private boolean onExitTile() {

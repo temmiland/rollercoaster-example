@@ -148,7 +148,7 @@ public class ExampleGame extends ApplicationAdapter {
         player.update(delta, input.pollMove());
         if (!player.isMoving() && player.getTileX() == (int) caveTile.x
                 && player.getTileZ() == (int) caveTile.z) {
-            distortion = new DistortionScreen(new DistortionMap(), lowRes, pixelCamera,
+            distortion = new DistortionScreen(new DistortionCave(), lowRes, pixelCamera,
                 modelBatch, blitBatch, playerSprite, playerAnimation, player, input, lighting, shadowMap);
             distortion.render(0f);
             return;

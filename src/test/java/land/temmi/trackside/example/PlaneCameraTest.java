@@ -1,7 +1,7 @@
 package land.temmi.trackside.example;
 
 import com.badlogic.gdx.math.Vector3;
-import land.temmi.rollercoaster.render.SurfaceCamera;
+import land.temmi.rollercoaster.render.PlaneCamera;
 import land.temmi.rollercoaster.world.GravityState;
 import org.junit.Test;
 
@@ -9,11 +9,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public final class SurfaceCameraTest {
+public final class PlaneCameraTest {
     private static final float PITCH = 45f;
 
     @Test public void groundIsFramedLikeTheOrdinaryFieldCamera() {
-        SurfaceCamera camera = snapped(GravityState.FLOOR);
+        PlaneCamera camera = snapped(GravityState.FLOOR);
         Vector3 direction = camera.direction(new Vector3());
         assertEquals(0f, direction.x, 1e-4f);
         assertEquals(-0.7071f, direction.y, 1e-3f);
@@ -36,7 +36,7 @@ public final class SurfaceCameraTest {
         Vector3 up = new Vector3();
         Vector3 axis = new Vector3();
         for (GravityState state : GravityState.values()) {
-            SurfaceCamera camera = snapped(state);
+            PlaneCamera camera = snapped(state);
             camera.direction(direction);
             camera.up(up);
             Vector3 screenRight = direction.cpy().crs(up).nor();
@@ -64,11 +64,11 @@ public final class SurfaceCameraTest {
         Vector3 up = new Vector3();
         Vector3 cameraUp = new Vector3();
 
-        SurfaceCamera ground = snapped(GravityState.FLOOR);
+        PlaneCamera ground = snapped(GravityState.FLOOR);
         ground.spriteBasis(right, up);
         assertEquals(1f, up.dot(ground.up(cameraUp)), 1e-3f);
 
-        SurfaceCamera ceiling = snapped(GravityState.CEILING);
+        PlaneCamera ceiling = snapped(GravityState.CEILING);
         ceiling.spriteBasis(right, up);
         assertEquals(-1f, up.dot(ceiling.up(cameraUp)), 1e-3f);
     }
@@ -80,7 +80,7 @@ public final class SurfaceCameraTest {
         Vector3 cameraUp = new Vector3();
         Vector3 cameraRight = new Vector3();
         for (GravityState state : new GravityState[] {GravityState.WEST_WALL, GravityState.EAST_WALL}) {
-            SurfaceCamera camera = snapped(state);
+            PlaneCamera camera = snapped(state);
             camera.spriteBasis(right, up);
             camera.up(cameraUp);
             cameraRight.set(camera.direction(new Vector3())).crs(cameraUp).nor();
@@ -88,8 +88,8 @@ public final class SurfaceCameraTest {
             assertEquals(state + " is not a quarter turn", 1f, Math.abs(up.dot(cameraRight)), 1e-3f);
         }
         // The two walls turn opposite ways, so a sprite is never mirrored between them.
-        SurfaceCamera west = snapped(GravityState.WEST_WALL);
-        SurfaceCamera east = snapped(GravityState.EAST_WALL);
+        PlaneCamera west = snapped(GravityState.WEST_WALL);
+        PlaneCamera east = snapped(GravityState.EAST_WALL);
         west.spriteBasis(right, up);
         west.up(cameraUp);
         cameraRight.set(west.direction(new Vector3())).crs(cameraUp).nor();
@@ -101,7 +101,7 @@ public final class SurfaceCameraTest {
     }
 
     @Test public void blendingRunsForItsDurationAndLandsOnTheTarget() {
-        SurfaceCamera camera = snapped(GravityState.FLOOR);
+        PlaneCamera camera = snapped(GravityState.FLOOR);
         camera.setBlendSeconds(0.2f);
         camera.blendTo(GravityState.CEILING.normal(new Vector3()), GravityState.CEILING.right(new Vector3()));
         assertTrue(camera.isBlending());
@@ -120,13 +120,13 @@ public final class SurfaceCameraTest {
     }
 
     @Test public void steppingWithinAPlaneDoesNotRestartABlend() {
-        SurfaceCamera camera = snapped(GravityState.FLOOR);
+        PlaneCamera camera = snapped(GravityState.FLOOR);
         camera.blendTo(GravityState.FLOOR.normal(new Vector3()), GravityState.FLOOR.right(new Vector3()));
         assertFalse(camera.isBlending());
     }
 
-    private static SurfaceCamera snapped(GravityState state) {
-        SurfaceCamera camera = new SurfaceCamera().setPitch(PITCH);
+    private static PlaneCamera snapped(GravityState state) {
+        PlaneCamera camera = new PlaneCamera().setPitch(PITCH);
         camera.snapTo(state.normal(new Vector3()), state.right(new Vector3()));
         return camera;
     }

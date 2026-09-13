@@ -13,9 +13,9 @@ ist die einzige Stelle, an der die Schwerkraft wechselt.
 
 Die Map liegt als eigenes Dokument in `maps/distortion.json`: jede Platte ist eine gewöhnliche
 Karte mit Tiles, Props und Entities, dazu ihre Schwerkraft und das Raster-Tile, auf dem ihre lokale
-(0, 0) sitzt. Start- und Ausgangsfeld sind Entities darin, keine Konstanten im Code. `DistortionMap`
+(0, 0) sitzt. Start- und Ausgangsfeld sind Entities darin, keine Konstanten im Code. `DistortionCave`
 lädt das Dokument und liefert das Tileset; Bewegung, Kollision, Geometrie und Kamera kommen aus der
-Bibliothek (siehe `docs/surface-rooms.md` in `rollercoaster`).
+Bibliothek (siehe `docs/folded-maps.md` in `rollercoaster`).
 
 Felsen und Kristalle sind echte Props aus `maps/models.json` und blockieren ihr Feld — auf der
 Decke hängen sie nach unten, an den Wänden stehen sie seitlich ab. Auch der Höhleneingang in der
