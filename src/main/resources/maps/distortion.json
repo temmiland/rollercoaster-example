@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "name": "zerrwelt",
+  "seamArc": 0.9,
+  "planes": [
+    {
+      "name": "boden",
+      "gravity": "floor",
+      "origin": [0, 0, 0],
+      "size": [9, 7],
+      "layers": {
+        "tile": [
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim"]
+        ]
+      },
+      "props": [
+        {
+          "model": "caveRock",
+          "x": 2,
+          "y": 1,
+          "elevation": 0,
+          "rot": 0
+        },
+        {
+          "model": "caveRock",
+          "x": 6,
+          "y": 2,
+          "elevation": 0,
+          "rot": 35
+        },
+        {
+          "model": "caveRock",
+          "x": 7,
+          "y": 4,
+          "elevation": 0,
+          "rot": 200
+        },
+        {
+          "model": "caveRock",
+          "x": 3,
+          "y": 4,
+          "elevation": 0,
+          "rot": 110
+        },
+        {
+          "model": "caveCrystal",
+          "x": 1,
+          "y": 4,
+          "elevation": 0,
+          "rot": 0
+        }
+      ],
+      "entities": [
+        {
+          "type": "player",
+          "sprite": "player",
+          "x": 4,
+          "y": 5
+        },
+        {
+          "type": "exit",
+          "x": 4,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "name": "westwand",
+      "gravity": "westWall",
+      "origin": [-2, 7, 6],
+      "size": [7, 7],
+      "layers": {
+        "tile": [
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim"]
+        ]
+      },
+      "props": [
+        {
+          "model": "caveRock",
+          "x": 2,
+          "y": 2,
+          "elevation": 0,
+          "rot": 60
+        },
+        {
+          "model": "caveRock",
+          "x": 5,
+          "y": 4,
+          "elevation": 0,
+          "rot": 15
+        },
+        {
+          "model": "caveCrystal",
+          "x": 5,
+          "y": 1,
+          "elevation": 0,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "name": "decke",
+      "gravity": "ceiling",
+      "origin": [0, 9, 6],
+      "size": [9, 7],
+      "layers": {
+        "tile": [
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim", "rim"]
+        ]
+      },
+      "props": [
+        {
+          "model": "caveRock",
+          "x": 2,
+          "y": 2,
+          "elevation": 0,
+          "rot": 250
+        },
+        {
+          "model": "caveRock",
+          "x": 6,
+          "y": 4,
+          "elevation": 0,
+          "rot": 80
+        },
+        {
+          "model": "caveRock",
+          "x": 4,
+          "y": 5,
+          "elevation": 0,
+          "rot": 130
+        },
+        {
+          "model": "caveCrystal",
+          "x": 7,
+          "y": 2,
+          "elevation": 0,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "name": "ostwand",
+      "gravity": "eastWall",
+      "origin": [10, 7, 0],
+      "size": [7, 7],
+      "layers": {
+        "tile": [
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rim", "rim", "rim", "rim", "rim", "rim"]
+        ]
+      },
+      "props": [
+        {
+          "model": "caveRock",
+          "x": 2,
+          "y": 5,
+          "elevation": 0,
+          "rot": 300
+        },
+        {
+          "model": "caveRock",
+          "x": 4,
+          "y": 2,
+          "elevation": 0,
+          "rot": 40
+        },
+        {
+          "model": "caveCrystal",
+          "x": 1,
+          "y": 1,
+          "elevation": 0,
+          "rot": 0
+        }
+      ]
+    }
+  ],
+  "seams": [
+    {
+      "from": [0, 0, 0],
+      "fromInput": "left",
+      "to": [-2, 1, 0],
+      "toInput": "down",
+      "step": [0, 0, 1],
+      "count": 7
+    },
+    {
+      "from": [-2, 7, 0],
+      "fromInput": "up",
+      "to": [0, 9, 0],
+      "toInput": "left",
+      "step": [0, 0, 1],
+      "count": 7
+    },
+    {
+      "from": [8, 9, 0],
+      "fromInput": "right",
+      "to": [10, 7, 0],
+      "toInput": "up",
+      "step": [0, 0, 1],
+      "count": 7
+    },
+    {
+      "from": [10, 1, 0],
+      "fromInput": "down",
+      "to": [8, 0, 0],
+      "toInput": "right",
+      "step": [0, 0, 1],
+      "count": 7
+    }
+  ]
+}

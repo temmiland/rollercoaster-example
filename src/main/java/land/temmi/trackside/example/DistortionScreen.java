@@ -54,7 +54,7 @@ final class DistortionScreen implements Disposable {
     private final Vector3 planeRight = new Vector3();
     private final Vector3 spriteRight = new Vector3();
     private final Vector3 spriteUp = new Vector3();
-    private final Vector3 exitTile;
+    private final Vector3 exitTile = new Vector3();
     private boolean finished;
 
     DistortionScreen(DistortionMap map, LowResTarget target, PixelCamera camera, ModelBatch batch,
@@ -65,11 +65,11 @@ final class DistortionScreen implements Disposable {
         this.blit = blit; this.sprite = sprite; this.animation = animation; this.player = player;
         this.input = input; this.lighting = lighting; this.shadowMap = shadowMap;
         scene = new SurfaceRoomScene(map.room, new Material(), ExampleMap.getModelCatalog(), SLAB_THICKNESS);
-        exitTile = map.exitTile();
+        map.exitTile(exitTile);
 
         surfaceCamera.setPitch(camera.getPitchDegrees());
         player.setMovementSpace(map.room);
-        Vector3 spawn = map.spawnTile();
+        Vector3 spawn = map.spawnTile(new Vector3());
         player.setGridTile((int) spawn.x, (int) spawn.y, (int) spawn.z);
         applyPlane(true);
     }
