@@ -23,6 +23,6 @@ dependencies {
 }
 
 robovm {
-    archs = 'x86_64'
-    iosSkipSigning = true
+    archs = 'arm64'
+    iosSkipSigning = false
 }
