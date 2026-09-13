@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -43,7 +42,6 @@ public class ExampleGame extends ApplicationAdapter {
     private LowResTarget lowRes;
     private PixelCamera pixelCamera;
     private SpriteBatch blitBatch;
-    private BitmapFont debugFont;
     private ShapeRenderer shapes;
     private final Matrix4 overlayProjection = new Matrix4();
 
@@ -64,7 +62,10 @@ public class ExampleGame extends ApplicationAdapter {
     private DirectionalSpriteAnimation playerAnimation;
     private float subjectWorldHeight;
     private final Vector3 subjectFootPosition = new Vector3(0f, 0f, 0f);
-    private boolean debugVisible;
+    private final Vector3 spriteRight = new Vector3();
+    private CaveEntrance cave;
+    private DistortionScreen distortion;
+    private int debugFrames;
 
     @Override
     public void create() {
@@ -75,7 +76,6 @@ public class ExampleGame extends ApplicationAdapter {
         pixelCamera.resize(lowRes.getWidth(), lowRes.getHeight());
 
         blitBatch = new SpriteBatch();
-        debugFont = new BitmapFont();
         shapes = new ShapeRenderer();
 
         lighting = new LightingEnvironment();
@@ -85,6 +85,7 @@ public class ExampleGame extends ApplicationAdapter {
         worldScene = ExampleMap.createScene();
         exampleLighting = new ExampleLighting(lighting, worldScene);
         LoadedMap map = worldScene.getMap();
+        cave = new CaveEntrance(map.tiles);
 
         billboardQuad = new BillboardQuad();
         createPlayerSprite();
@@ -114,8 +115,25 @@ public class ExampleGame extends ApplicationAdapter {
 
     @Override
     public void render() {
-        float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F3)) debugVisible = !debugVisible;
+        render(Gdx.graphics.getDeltaTime());
+    }
+
+    /** Frame with an explicit time step, so a driver can advance the game without the window loop. */
+    void render(float delta) {
+        if (debugFrames++ < 3) {
+            Gdx.app.log("ExampleGame", "render frame " + debugFrames + " "
+                + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight()
+                + " GL=" + Gdx.gl.glGetString(GL20.GL_VERSION));
+        }
+        if (distortion != null) {
+            distortion.render(delta);
+            if (distortion.isFinished()) {
+                distortion.dispose();
+                distortion = null;
+                player.setTile(CaveEntrance.X, CaveEntrance.Z + 1);
+            }
+            return;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
             exampleLighting.toggle();
         }
@@ -127,6 +145,13 @@ public class ExampleGame extends ApplicationAdapter {
         dayNightCycle.update(delta);
         exampleLighting.update(dayNightCycle.getSituation());
         player.update(delta, input.pollMove());
+        if (!player.isMoving() && player.getTileX() == CaveEntrance.X
+                && player.getTileZ() == CaveEntrance.Z) {
+            distortion = new DistortionScreen(new DistortionMap(), lowRes, pixelCamera,
+                modelBatch, blitBatch, playerSprite, playerAnimation, player, input, lighting, shadowMap);
+            distortion.render(0f);
+            return;
+        }
         playerAnimation.setFacing(player.getFacing());
         playerAnimation.setMoving(player.isMoving());
         playerAnimation.update(delta);
@@ -137,9 +162,11 @@ public class ExampleGame extends ApplicationAdapter {
         pixelCamera.snapToPixelGrid(lowRes.getWidth(), lowRes.getHeight());
 
         playerSprite.setPosition(subjectFootPosition);
+        playerSprite.setBasis(pixelCamera.right(spriteRight), pixelCamera.camera.up);
 
         shadowCasters.clear();
         shadowCasters.addAll(worldScene.getInstances());
+        shadowCasters.add(cave.instance);
         shadowMap.render(subjectFootPosition, shadowCasters);
 
         lowRes.begin();
@@ -148,11 +175,11 @@ public class ExampleGame extends ApplicationAdapter {
 
         modelBatch.begin(pixelCamera.camera);
         modelBatch.render(worldScene.getVisibleInstances(pixelCamera.camera, visibleInstances));
+        modelBatch.render(cave.instance);
         modelBatch.render(playerSprite);
         modelBatch.end();
 
         drawPixelRuler();
-        if (debugVisible) drawDebugOverlay();
         lowRes.end();
 
         lowRes.blitToScreen(blitBatch);
@@ -184,35 +211,12 @@ public class ExampleGame extends ApplicationAdapter {
         shapes.end();
     }
 
-    private void drawDebugOverlay() {
-        int width = lowRes.getWidth();
-        int height = lowRes.getHeight();
-        String text = "FPS " + Gdx.graphics.getFramesPerSecond()
-            + "  GL " + Gdx.gl.glGetString(GL20.GL_VERSION)
-            + "  depth " + lowRes.getDepthBits() + "b\n"
-            + "FBO " + width + "x" + height
-            + "  tile " + player.getTileX() + "," + player.getTileZ()
-            + "  world " + subjectFootPosition.x + "," + subjectFootPosition.y
-            + "," + subjectFootPosition.z + "\n"
-            + "time " + String.format(java.util.Locale.ROOT, "%.1fh", dayNightCycle.getTimeOfDay())
-            + "  " + dayNightCycle.getSituation().getDisplayName()
-            + (dayNightCycle.getPendingSituation() == dayNightCycle.getSituation() ? "" :
-                " -> " + dayNightCycle.getPendingSituation().getDisplayName())
-            + "  lamps " + (exampleLighting.isEnabled() ? "on" : "off") + "\n"
-            + "camera fov " + pixelCamera.getFovDegrees()
-            + " pitch " + pixelCamera.getPitchDegrees()
-            + " distance " + pixelCamera.getDistance();
-        blitBatch.setProjectionMatrix(overlayProjection.setToOrtho2D(0, 0, width, height));
-        blitBatch.begin();
-        debugFont.draw(blitBatch, text, 10f, height - 10f);
-        blitBatch.end();
-    }
-
     @Override
     public void dispose() {
+        if (distortion != null) distortion.dispose();
+        cave.dispose();
         lowRes.dispose();
         blitBatch.dispose();
-        debugFont.dispose();
         shapes.dispose();
         modelBatch.dispose();
         shadowMap.dispose();
