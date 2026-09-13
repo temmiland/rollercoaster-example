@@ -38,7 +38,7 @@ import land.temmi.rollercoaster.input.TouchInput;
 
 public class ExampleGame extends ApplicationAdapter {
 
-    private static final float TERRAIN_LEVEL_PIXEL_HEIGHT = 27f;
+    private static final float TERRAIN_LEVEL_PIXEL_HEIGHT = 48f;
 
     private LowResTarget lowRes;
     private PixelCamera pixelCamera;
