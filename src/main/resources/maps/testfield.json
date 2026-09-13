@@ -110,12 +110,16 @@
     ]
   },
   "props": [
+    { "model": "caveArch", "x": 12, "y": 2, "elevation": 0, "rot": 0 },
+    { "model": "cavePillar", "x": 11, "y": 2, "elevation": 0, "rot": 0 },
+    { "model": "cavePillar", "x": 13, "y": 2, "elevation": 0, "rot": 0 },
     {"model": "house", "x": 8, "y": 10, "elevation": 0, "rot": 0},
     {"model": "streetLamp", "x": 10, "y": 13, "elevation": 0, "rot": 0},
     {"model": "streetLamp", "x": 10, "y": 3, "elevation": 0, "rot": 0},
     {"model": "suspensionBridge", "x": 12, "y": 6, "elevation": 0, "rot": 0}
   ],
   "entities": [
+    { "type": "cave", "x": 12, "y": 2 },
     {"type": "player", "sprite": "player", "x": 12, "y": 14}
   ]
 }

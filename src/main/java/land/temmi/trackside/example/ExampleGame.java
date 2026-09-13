@@ -63,8 +63,8 @@ public class ExampleGame extends ApplicationAdapter {
     private float subjectWorldHeight;
     private final Vector3 subjectFootPosition = new Vector3(0f, 0f, 0f);
     private final Vector3 spriteRight = new Vector3();
-    private CaveEntrance cave;
     private DistortionScreen distortion;
+    private final Vector3 caveTile = new Vector3();
     private int debugFrames;
 
     @Override
@@ -85,12 +85,13 @@ public class ExampleGame extends ApplicationAdapter {
         worldScene = ExampleMap.createScene();
         exampleLighting = new ExampleLighting(lighting, worldScene);
         LoadedMap map = worldScene.getMap();
-        cave = new CaveEntrance(map.tiles);
 
         billboardQuad = new BillboardQuad();
         createPlayerSprite();
         player = new GridActor(map.tiles.getWidth(), map.tiles.getDepth(), 5f);
-        MapEntity playerEntity = findPlayer(map);
+        MapEntity playerEntity = findEntity(map, "player");
+        MapEntity caveEntity = findEntity(map, "cave");
+        caveTile.set(caveEntity.x, 0f, caveEntity.z);
         player.setTileAccess(new TerrainRules(map.tiles));
         player.setTile(playerEntity.x, playerEntity.z);
         input = new CombinedInput(new KeyboardInput(), new TouchInput());
@@ -130,7 +131,7 @@ public class ExampleGame extends ApplicationAdapter {
             if (distortion.isFinished()) {
                 distortion.dispose();
                 distortion = null;
-                player.setTile(CaveEntrance.X, CaveEntrance.Z + 1);
+                player.setTile((int) caveTile.x, (int) caveTile.z + 1);
             }
             return;
         }
@@ -145,8 +146,8 @@ public class ExampleGame extends ApplicationAdapter {
         dayNightCycle.update(delta);
         exampleLighting.update(dayNightCycle.getSituation());
         player.update(delta, input.pollMove());
-        if (!player.isMoving() && player.getTileX() == CaveEntrance.X
-                && player.getTileZ() == CaveEntrance.Z) {
+        if (!player.isMoving() && player.getTileX() == (int) caveTile.x
+                && player.getTileZ() == (int) caveTile.z) {
             distortion = new DistortionScreen(new DistortionMap(), lowRes, pixelCamera,
                 modelBatch, blitBatch, playerSprite, playerAnimation, player, input, lighting, shadowMap);
             distortion.render(0f);
@@ -166,7 +167,6 @@ public class ExampleGame extends ApplicationAdapter {
 
         shadowCasters.clear();
         shadowCasters.addAll(worldScene.getInstances());
-        shadowCasters.add(cave.instance);
         shadowMap.render(subjectFootPosition, shadowCasters);
 
         lowRes.begin();
@@ -175,7 +175,6 @@ public class ExampleGame extends ApplicationAdapter {
 
         modelBatch.begin(pixelCamera.camera);
         modelBatch.render(worldScene.getVisibleInstances(pixelCamera.camera, visibleInstances));
-        modelBatch.render(cave.instance);
         modelBatch.render(playerSprite);
         modelBatch.end();
 
@@ -189,11 +188,11 @@ public class ExampleGame extends ApplicationAdapter {
         dayNightCycle.setTimeOfDay(hours).enterMap().setPaused(true);
     }
 
-    private static MapEntity findPlayer(LoadedMap map) {
+    private static MapEntity findEntity(LoadedMap map, String type) {
         for (MapEntity entity : map.entities) {
-            if ("player".equals(entity.type)) return entity;
+            if (type.equals(entity.type)) return entity;
         }
-        throw new IllegalArgumentException("Map has no player entity");
+        throw new IllegalArgumentException("Map has no " + type + " entity");
     }
 
     // Horizontal ticks every 10px (brighter every 50px) reveal the terrain-level scale.
@@ -214,7 +213,6 @@ public class ExampleGame extends ApplicationAdapter {
     @Override
     public void dispose() {
         if (distortion != null) distortion.dispose();
-        cave.dispose();
         lowRes.dispose();
         blitBatch.dispose();
         shapes.dispose();

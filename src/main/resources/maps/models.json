@@ -29,6 +29,42 @@
       "collision": { "min": [-3, 0], "max": [3, 0] },
       "walkable": true,
       "walkHeight": 2.12
+    },
+    {
+      "id": "caveArch",
+      "source": "gltf:models/cave-arch.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 2.4,
+      "bounds": { "min": [-1.35, 0, -0.9], "max": [1.35, 2.4, 0.85] },
+      "collision": { "min": [-1, -1], "max": [1, -1] }
+    },
+    {
+      "id": "cavePillar",
+      "source": "gltf:models/cave-pillar.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 1.85,
+      "bounds": { "min": [-0.5, 0, -0.75], "max": [0.5, 1.85, 0.75] },
+      "collision": { "min": [0, 0], "max": [0, 0] }
+    },
+    {
+      "id": "caveRock",
+      "source": "gltf:models/cave-rock.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 0.4,
+      "bounds": { "min": [-0.37, 0, -0.31], "max": [0.37, 0.4, 0.31] },
+      "collision": { "min": [0, 0], "max": [0, 0] }
+    },
+    {
+      "id": "caveCrystal",
+      "source": "gltf:models/cave-crystal.gltf",
+      "anchor": [0, 0, 0],
+      "scale": 1,
+      "height": 1.24,
+      "bounds": { "min": [-0.25, 0, -0.25], "max": [0.25, 1.24, 0.25] },
+      "collision": { "min": [0, 0], "max": [0, 0] }
     }
   ]
 }
