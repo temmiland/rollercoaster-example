@@ -111,9 +111,9 @@
   },
   "props": [
     {"model": "house", "x": 8, "y": 10, "elevation": 0, "rot": 0},
-    {"model": "streetLamp", "x": 10.8, "y": 13, "elevation": 0, "rot": 0},
-    {"model": "streetLamp", "x": 10.8, "y": 3, "elevation": 0, "rot": 0},
-    {"model": "suspensionBridge", "x": 11.5, "y": 5.5, "elevation": 0, "rot": 0}
+    {"model": "streetLamp", "x": 10, "y": 13, "elevation": 0, "rot": 0},
+    {"model": "streetLamp", "x": 10, "y": 3, "elevation": 0, "rot": 0},
+    {"model": "suspensionBridge", "x": 12, "y": 6, "elevation": 0, "rot": 0}
   ],
   "entities": [
     {"type": "player", "sprite": "player", "x": 12, "y": 14}

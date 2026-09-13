@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import land.temmi.trackside.example.ExampleGame;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
@@ -117,10 +118,10 @@ public final class RenderSmokeTest extends ExampleGame {
             || map.tiles.isBlocked(6, 8) || map.tiles.isBlocked(10, 11)
             || map.props.size != 4 || map.entities.size != 1
             || map.props.first().elevation != 0f
-            || !"streetLamp".equals(map.props.get(1).model) || map.props.get(1).x != 10.8f
+            || !"streetLamp".equals(map.props.get(1).model) || map.props.get(1).x != 10f
             || map.props.get(1).z != 13f || map.props.get(2).z != 3f
             || !"suspensionBridge".equals(map.props.get(3).model)
-            || map.props.get(3).x != 11.5f || map.props.get(3).z != 5.5f
+            || map.props.get(3).x != 12f || map.props.get(3).z != 6f
             || !"player".equals(map.entities.first().type)
             || map.entities.first().x != 12 || map.entities.first().z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
@@ -244,6 +245,14 @@ public final class RenderSmokeTest extends ExampleGame {
         }
     }
 
+    private static void assertTranslation(ModelInstance instance, float x, float y, float z, String label) {
+        Vector3 translation = instance.transform.getTranslation(new Vector3());
+        if (Math.abs(translation.x - x) > 1e-5f || Math.abs(translation.y - y) > 1e-5f
+            || Math.abs(translation.z - z) > 1e-5f) {
+            throw new AssertionError(label + " is not centred on its tile: " + translation);
+        }
+    }
+
     private void verifyChunks() {
         // createScene exercises the real path: it bakes the chunks, validates the prop
         // footprint against the collision layer and instantiates the catalog models.
@@ -279,6 +288,12 @@ public final class RenderSmokeTest extends ExampleGame {
                 || tiles.isBlocked(5, 8) || tiles.isBlocked(11, 8)) {
                 throw new AssertionError("Model collision was not merged into the map collision");
             }
+            GridActor lampApproach = actorAt(new TerrainRules(tiles), 10, 14);
+            lampApproach.update(0f, MoveIntent.UP);
+            lampApproach.update(1f, MoveIntent.UP);
+            if (lampApproach.getTileX() != 10 || lampApproach.getTileZ() != 14) {
+                throw new AssertionError("Street lamp does not block its rendered tile");
+            }
             for (int x = 9; x <= 15; x++) if (tiles.isBlocked(x, 6) || !tiles.hasWalkableSurface(x, 6)) {
                 throw new AssertionError("Bridge collision footprint is not walkable");
             }
@@ -289,7 +304,7 @@ public final class RenderSmokeTest extends ExampleGame {
             if (blocked != 22) throw new AssertionError("Expected house and lamp footprints, got " + blocked);
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
             if (!"gltf:models/house.gltf".equals(house.source)
-                || house.offsetX != -1f || house.offsetY != 0f || house.offsetZ != -1f
+                || house.offsetX != -0.5f || house.offsetY != 0f || house.offsetZ != -0.5f
                 || house.scale != 1f || house.height != 4f
                 || house.boundsMinX != -1.8f || house.boundsMinY != 0f || house.boundsMinZ != -1.3f
                 || house.boundsMaxX != 2.8f || house.boundsMaxY != 4f || house.boundsMaxZ != 2.3f
@@ -313,10 +328,20 @@ public final class RenderSmokeTest extends ExampleGame {
                 || bridge.scale != 1f || bridge.height != 3.04f
                 || bridge.boundsMinX != -3.5f || bridge.boundsMinY != 0f || bridge.boundsMinZ != -0.45f
                 || bridge.boundsMaxX != 3.5f || bridge.boundsMaxY != 3.04f || bridge.boundsMaxZ != 0.45f
-                || bridge.collisionMinX != -2 || bridge.collisionMaxX != 4
-                || bridge.collisionMinZ != 1 || bridge.collisionMaxZ != 1
+                || bridge.collisionMinX != -3 || bridge.collisionMaxX != 3
+                || bridge.collisionMinZ != 0 || bridge.collisionMaxZ != 0
                 || !bridge.walkable || bridge.walkHeight != 2.12f) {
                 throw new AssertionError("Model manifest did not load bridge metadata");
+            }
+            assertTranslation(houseInstance, 7f, 0f, 9f, "house");
+            for (ModelInstance instance : scene.getInstances()) {
+                if (!(instance.userData instanceof MapProp)) continue;
+                MapProp prop = (MapProp) instance.userData;
+                if ("streetLamp".equals(prop.model)) {
+                    assertTranslation(instance, prop.x - 0.5f, 0f, prop.z - 0.5f, "street lamp");
+                } else if ("suspensionBridge".equals(prop.model)) {
+                    assertTranslation(instance, 11.5f, -0.12f, 5.5f, "bridge");
+                }
             }
             for (Model chunk : chunks) {
                 if (chunk.meshes.size != 1 || chunk.meshParts.size != 1 || chunk.materials.size != 1) {
