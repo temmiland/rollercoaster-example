@@ -47,3 +47,20 @@ tasks.register('lightingSmokeTest', JavaExec) {
         jvmArgs += ['-XstartOnFirstThread']
     }
 }
+
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation libs.gdx.backend.lwjgl3
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-desktop"
+}
+
+tasks.register('worldSmokeTest', JavaExec) {
+    group = 'verification'
+    description = 'Renders each distortion gravity surface in a desktop GL context.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'land.temmi.trackside.example.WorldSmoke'
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+        jvmArgs += ['-XstartOnFirstThread']
+    }
+}
