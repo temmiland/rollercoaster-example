@@ -11,9 +11,16 @@ Vier Platten schweben im blauen Nichts und bilden eine Schleife: Boden, Westwand
 Die Platten berühren sich nicht — zwischen ihnen liegt eine Lücke, über die die Figur springt. Das
 ist die einzige Stelle, an der die Schwerkraft wechselt.
 
-`DistortionMap` hält nur den Inhalt: die vier Platten, ihre Farben und die Nahtstellen an den
-Ecken. Bewegung, Kollision, Geometrie und Kamera kommen aus der Bibliothek
-(siehe `docs/surface-rooms.md` in `rollercoaster`).
+Die Map liegt als eigenes Dokument in `maps/distortion.json`: jede Platte ist eine gewöhnliche
+Karte mit Tiles, Props und Entities, dazu ihre Schwerkraft und das Raster-Tile, auf dem ihre lokale
+(0, 0) sitzt. Start- und Ausgangsfeld sind Entities darin, keine Konstanten im Code. `DistortionMap`
+lädt das Dokument und liefert das Tileset; Bewegung, Kollision, Geometrie und Kamera kommen aus der
+Bibliothek (siehe `docs/surface-rooms.md` in `rollercoaster`).
+
+Felsen und Kristalle sind echte Props aus `maps/models.json` und blockieren ihr Feld — auf der
+Decke hängen sie nach unten, an den Wänden stehen sie seitlich ab. Auch der Höhleneingang in der
+Testmap ist ein Prop (`caveArch` plus zwei `cavePillar`); seine Kollision kommt aus dem
+Modell-Manifest, nicht aus handgesetzten Feldern.
 
 ## Steuerung
 
@@ -41,10 +48,11 @@ Platten projiziert wird.
 
 ## Prüfung
 
-- `./gradlew test --offline` — Eingabetabellen, die komplette Schleife in beide Richtungen,
-  Umkehrbarkeit jeder Naht, blockierte Schritte, Bogen über die Lücke, und für die Kamera: dass sie
-  nie rollt, jede Fläche von ihrer freien Seite zeigt, rechts immer rechts bleibt und der Sprite
-  unter der Decke kopfsteht.
+- `./gradlew test --offline` — Eingabetabellen, die komplette Schleife, Umkehrbarkeit jedes
+  Übergangs, dass kein Schritt aus dem Raum führt, Bogen über die Lücke, dass Props weder die
+  Übergänge noch die Startrunde zumauern, und für die Kamera: dass sie nie rollt, jede Fläche von
+  ihrer freien Seite zeigt, rechts immer rechts bleibt und der Sprite unter der Decke kopfsteht.
+  Die Tests lesen dafür die Map und das Modell-Manifest, statt die Maße zu wiederholen.
 - `./gradlew worldSmokeTest --offline` — echter Desktop-GL-Durchlauf durch alle vier Flächen.
   Schreibt pro Fläche einen Screenshot nach `build/smoke/`.
 - `./gradlew :platforms:desktop:run --offline` — interaktiv starten.

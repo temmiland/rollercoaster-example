@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.PixmapIO;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.InputSource;
 import land.temmi.rollercoaster.input.MoveIntent;
+import com.badlogic.gdx.math.Vector3;
 import land.temmi.rollercoaster.world.GravityState;
 
 import java.lang.reflect.Field;
@@ -54,7 +55,11 @@ public final class WorldSmoke {
     private static void run(ExampleGame game) throws Exception {
         set(game, "input", (InputSource) () -> SCRIPTED[0]);
         GridActor player = (GridActor) get(game, "player");
-        player.setTile(CaveEntrance.X, CaveEntrance.Z);
+        Vector3 cave = (Vector3) get(game, "caveTile");
+        player.setTile((int) cave.x, (int) cave.z + 3);
+        frames(game, 2);
+        shot("00-overworld");
+        player.setTile((int) cave.x, (int) cave.z);
         frames(game, 2);
         check(get(game, "distortion") != null, "the cave did not open");
         shot("01-ground");
