@@ -67,6 +67,7 @@ public final class RenderSmokeTest extends ExampleGame {
         verifyTerrainSteps();
         verifyDepthAndTexture();
         verifySprites();
+        OcclusionChecks.verify();
         if (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) throw new AssertionError("OpenGL error");
         System.out.println("PASS: four single-mesh chunks, opaque depth in both orders, texture UV transform, four-direction sprite atlas, GL_NO_ERROR");
         Gdx.app.exit();

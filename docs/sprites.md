@@ -26,5 +26,12 @@ Das vollständige Manifest enthält alle vier Richtungen. `DirectionalSpriteAnim
 benannten Regionen auf und wechselt anhand von `GridActor.getFacing()` zwischen Idle und Lauf-
 Frames. Der Fußpunkt bleibt dabei in der Tilemitte, weil nur die Billboard-Region wechselt.
 
+Der Atlas hat unter den Füßen zwei transparente Pixelzeilen; das Billboard verwendet deshalb
+`setBottomPadding(2f / 24f)`. Seine Bildfläche zeigt zur Kamera, während die Tiefenprüfung eine
+aufrechte Fläche durch den Fußpunkt verwendet. So schneidet die Figur weder Hauswände noch
+aufsteigende Rampen. In der Höhle richtet sie sich nach der Normalen der begehbaren Fläche.
+`./gradlew renderSmokeTest` prüft die sichtbaren Sprite-Pixel auch während der Bewegung und in
+beiden Zeichenreihenfolgen; die Kontrollbilder liegen unter `build/occlusion/`.
+
 Für echte Spiel-Assets ersetzt der Editor später PNG und Atlasdatei; die Runtime benötigt keine
 Pixel- oder Packing-Logik.

@@ -100,6 +100,7 @@ final class DistortionScreen implements Disposable {
         sprite.setRegion(animation.getFrame());
         planeCamera.spriteBasis(spriteRight, spriteUp);
         sprite.setBasis(spriteRight, spriteUp);
+        sprite.setDepthUp(normal);
         sprite.setPosition(player.getPosition());
 
         camera.follow(player.getPosition(), TileMap.LEVEL_HEIGHT, TERRAIN_LEVEL_PIXEL_HEIGHT, direction, up);

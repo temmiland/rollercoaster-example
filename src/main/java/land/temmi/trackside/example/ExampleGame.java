@@ -105,7 +105,7 @@ public class ExampleGame extends ApplicationAdapter {
         subjectWorldHeight = playerDefinition.worldHeight;
         playerSprite = new BillboardRenderer(billboardQuad, playerAtlas.getTexture(),
             playerAnimation.getFrame(), subjectWorldHeight);
-        playerSprite.setBottomPadding(3f / 24f);
+        playerSprite.setBottomPadding(2f / 24f);
     }
 
     @Override
@@ -164,6 +164,7 @@ public class ExampleGame extends ApplicationAdapter {
 
         playerSprite.setPosition(subjectFootPosition);
         playerSprite.setBasis(pixelCamera.right(spriteRight), pixelCamera.camera.up);
+        playerSprite.setDepthUp(Vector3.Y);
 
         shadowCasters.clear();
         shadowCasters.addAll(worldScene.getInstances());
