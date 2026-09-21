@@ -41,4 +41,43 @@ public final class RampMovementTest {
         actor.update(0.25f, MoveIntent.NONE);
         assertEquals("The top edge meets the plateau without a drop", 1f, actor.getPosition().y, EPSILON);
     }
+
+    @Test public void walkingBelowARaisedSurfaceStaysOnTheGround() {
+        TileMap map = flatMap(3);
+        map.setWalkableSurface(1, 0, 2f);
+        GridActor actor = actorAt(map, 0);
+
+        actor.update(0f, MoveIntent.RIGHT);
+        actor.update(0.75f, MoveIntent.NONE);
+
+        assertEquals("The bridge deck must not pull an actor up from below", 0f, actor.getPosition().y, EPSILON);
+        assertEquals("The actor must be inside the bridge tile while walking below it", 0.25f,
+            actor.getPosition().x, EPSILON);
+    }
+
+    @Test public void walkingOnARaisedSurfaceStaysOnItsDeck() {
+        TileMap map = flatMap(3);
+        map.setWalkableSurface(1, 0, 2f);
+        map.setWalkableSurface(2, 0, 2f);
+        GridActor actor = actorAt(map, 1);
+
+        actor.update(0f, MoveIntent.RIGHT);
+        actor.update(0.75f, MoveIntent.NONE);
+
+        assertEquals("An actor on the bridge must remain on its deck", 2f, actor.getPosition().y, EPSILON);
+    }
+
+    private static TileMap flatMap(int width) {
+        TileMap map = new TileMap(width, 1);
+        TileSurface ground = new TileSurface("ground");
+        for (int x = 0; x < width; x++) map.set(x, 0, ground, 0f, TileShape.FLAT, false);
+        return map;
+    }
+
+    private static GridActor actorAt(TileMap map, int x) {
+        GridActor actor = new GridActor(map.getWidth(), map.getDepth(), 1f);
+        actor.setTileAccess(new TerrainRules(map));
+        actor.setTile(x, 0);
+        return actor;
+    }
 }

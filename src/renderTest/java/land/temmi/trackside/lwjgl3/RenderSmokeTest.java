@@ -116,14 +116,18 @@ public final class RenderSmokeTest extends ExampleGame {
             Gdx.files.classpath("maps/testfield.json"), tileset);
         if (!"testfeld".equals(map.name) || map.tiles.getWidth() != 24 || map.tiles.getDepth() != 24
             || map.tiles.isBlocked(6, 8) || map.tiles.isBlocked(10, 11)
-            || map.props.size != 4 || map.entities.size != 1
+            || map.props.size != 7 || map.entities.size != 2
             || map.props.first().elevation != 0f
-            || !"streetLamp".equals(map.props.get(1).model) || map.props.get(1).x != 10f
-            || map.props.get(1).z != 13f || map.props.get(2).z != 3f
-            || !"suspensionBridge".equals(map.props.get(3).model)
-            || map.props.get(3).x != 12f || map.props.get(3).z != 6f
-            || !"player".equals(map.entities.first().type)
-            || map.entities.first().x != 12 || map.entities.first().z != 14) {
+            || !"caveArch".equals(map.props.get(0).model)
+            || !"cavePillar".equals(map.props.get(1).model) || !"cavePillar".equals(map.props.get(2).model)
+            || !"house".equals(map.props.get(3).model)
+            || !"streetLamp".equals(map.props.get(4).model) || map.props.get(4).x != 10f
+            || map.props.get(4).z != 13f || map.props.get(5).z != 3f
+            || !"suspensionBridge".equals(map.props.get(6).model)
+            || map.props.get(6).x != 12f || map.props.get(6).z != 6f
+            || !"cave".equals(map.entities.get(0).type)
+            || !"player".equals(map.entities.get(1).type)
+            || map.entities.get(1).x != 12 || map.entities.get(1).z != 14) {
             throw new AssertionError("Map document did not load its layers, prop, and entity");
         }
         if (map.tiles.getHeight(18, 11) != 0f || map.tiles.getHeight(18, 10) != 0.5f
@@ -261,8 +265,8 @@ public final class RenderSmokeTest extends ExampleGame {
             Array<Model> chunks = new Array<>();
             for (Model chunk : sceneChunks(scene)) chunks.add(chunk);
             if (chunks.size != 4) throw new AssertionError("Expected four chunks");
-            if (scene.getInstances().size != 8) {
-                throw new AssertionError("Expected four chunk instances, house, two lamps, and bridge");
+            if (scene.getInstances().size != 11) {
+                throw new AssertionError("Expected four chunks and seven map props");
             }
             Array<ModelInstance> visible = new Array<>();
             scene.getVisibleInstances(housePeekCamera(), visible);
@@ -281,6 +285,8 @@ public final class RenderSmokeTest extends ExampleGame {
             land.temmi.rollercoaster.world.TileMap tiles = scene.getMap().tiles;
             if (!tiles.isBlocked(6, 8) || !tiles.isBlocked(10, 11) || !tiles.isBlocked(8, 10)
                 || !tiles.isBlocked(10, 3) || !tiles.isBlocked(10, 13)
+                || !tiles.isBlocked(11, 1) || !tiles.isBlocked(12, 1) || !tiles.isBlocked(13, 1)
+                || !tiles.isBlocked(11, 2) || !tiles.isBlocked(13, 2)
                 || tiles.isBlocked(9, 3) || tiles.isBlocked(11, 3)
                 || tiles.isBlocked(10, 2) || tiles.isBlocked(10, 4)
                 || tiles.isBlocked(9, 13) || tiles.isBlocked(11, 13)
@@ -301,7 +307,7 @@ public final class RenderSmokeTest extends ExampleGame {
             for (int z = 0; z < tiles.getDepth(); z++) {
                 for (int x = 0; x < tiles.getWidth(); x++) if (tiles.isBlocked(x, z)) blocked++;
             }
-            if (blocked != 22) throw new AssertionError("Expected house and lamp footprints, got " + blocked);
+            if (blocked != 27) throw new AssertionError("Expected all model footprints, got " + blocked);
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
             if (!"gltf:models/house.gltf".equals(house.source)
                 || house.offsetX != -0.5f || house.offsetY != 0f || house.offsetZ != -0.5f
