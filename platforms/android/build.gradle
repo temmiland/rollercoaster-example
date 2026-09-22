@@ -13,9 +13,42 @@ android {
         versionCode 1
         versionName '0.1.0'
     }
+
+    // gdx-platform's Android natives jars hold their .so files at the jar root, not in the
+    // jniLibs/<abi> layout AGP expects from a plain dependency - copyAndroidNatives below unpacks
+    // them into libs/<abi>, which this tells AGP to package.
+    sourceSets {
+        main.jniLibs.srcDirs = ['libs']
+    }
 }
+
+configurations { natives }
 
 dependencies {
     implementation project(':')
     implementation libs.gdx.backend.android
+    natives "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:${libs.versions.gdx.get()}:natives-x86_64"
+}
+
+tasks.register('copyAndroidNatives') {
+    doFirst {
+        ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi -> file("libs/${abi}").mkdirs() }
+        configurations.natives.files.each { jar ->
+            def abi = ['armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'].find { jar.name.endsWith("natives-${it}.jar") }
+            if (abi != null) {
+                copy {
+                    from zipTree(jar)
+                    into file("libs/${abi}")
+                    include '*.so'
+                }
+            }
+        }
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.contains('package')) task.dependsOn 'copyAndroidNatives'
 }
