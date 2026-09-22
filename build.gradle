@@ -32,7 +32,7 @@ tasks.register('renderSmokeTest', JavaExec) {
     group = 'verification'
     description = 'Checks the example world in a desktop OpenGL context.'
     classpath = sourceSets.renderTest.runtimeClasspath
-    mainClass = 'land.temmi.trackside.lwjgl3.RenderSmokeTest'
+    mainClass = 'land.temmi.rollercoaster.lwjgl3.RenderSmokeTest'
     if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         jvmArgs += ['-XstartOnFirstThread']
     }
@@ -42,7 +42,7 @@ tasks.register('lightingSmokeTest', JavaExec) {
     group = 'verification'
     description = 'Checks cast shadows, local lights and emission in a desktop OpenGL context.'
     classpath = sourceSets.renderTest.runtimeClasspath
-    mainClass = 'land.temmi.trackside.lwjgl3.LightingSmokeTest'
+    mainClass = 'land.temmi.rollercoaster.lwjgl3.LightingSmokeTest'
     if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         jvmArgs += ['-XstartOnFirstThread']
     }
@@ -59,7 +59,7 @@ tasks.register('worldSmokeTest', JavaExec) {
     group = 'verification'
     description = 'Renders each distortion gravity surface in a desktop GL context.'
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'land.temmi.trackside.example.WorldSmoke'
+    mainClass = 'land.temmi.rollercoaster.example.WorldSmoke'
     if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         jvmArgs += ['-XstartOnFirstThread']
     }

@@ -73,11 +73,18 @@
     {
       "name": "westwand",
       "gravity": "westWall",
-      "origin": [-2, 7, 6],
-      "size": [7, 7],
+      "origin": [-2, 14, 6],
+      "size": [7, 14],
       "layers": {
         "tile": [
           ["rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
@@ -113,7 +120,7 @@
     {
       "name": "decke",
       "gravity": "ceiling",
-      "origin": [0, 9, 6],
+      "origin": [0, 16, 6],
       "size": [9, 7],
       "layers": {
         "tile": [
@@ -160,11 +167,18 @@
     {
       "name": "ostwand",
       "gravity": "eastWall",
-      "origin": [10, 7, 0],
-      "size": [7, 7],
+      "origin": [10, 14, 0],
+      "size": [7, 14],
       "layers": {
         "tile": [
           ["rim", "rim", "rim", "rim", "rim", "rim", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
+          ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
           ["rim", "rock", "rock", "rock", "rock", "rock", "rim"],
@@ -200,36 +214,28 @@
   ],
   "crossings": [
     {
-      "from": [0, 0, 0],
+      "from": [0, 0, 3],
       "fromInput": "left",
-      "to": [-2, 1, 0],
-      "toInput": "down",
-      "step": [0, 0, 1],
-      "count": 7
+      "to": [-2, 1, 3],
+      "toInput": "down"
     },
     {
-      "from": [-2, 7, 0],
+      "from": [-2, 14, 3],
       "fromInput": "up",
-      "to": [0, 9, 0],
-      "toInput": "left",
-      "step": [0, 0, 1],
-      "count": 7
+      "to": [0, 16, 3],
+      "toInput": "left"
     },
     {
-      "from": [8, 9, 0],
+      "from": [8, 16, 3],
       "fromInput": "right",
-      "to": [10, 7, 0],
-      "toInput": "up",
-      "step": [0, 0, 1],
-      "count": 7
+      "to": [10, 14, 3],
+      "toInput": "up"
     },
     {
-      "from": [10, 1, 0],
+      "from": [10, 1, 3],
       "fromInput": "down",
-      "to": [8, 0, 0],
-      "toInput": "right",
-      "step": [0, 0, 1],
-      "count": 7
+      "to": [8, 0, 3],
+      "toInput": "right"
     }
   ]
 }

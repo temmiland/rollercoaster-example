@@ -3,9 +3,9 @@
     <executableName>example-game</executableName>
     <iosInfoPList>Info.plist</iosInfoPList>
     <target>ios</target>
-    <mainClass>land.temmi.trackside.ios.IOSLauncher</mainClass>
+    <mainClass>land.temmi.rollercoaster.ios.IOSLauncher</mainClass>
     <forceLinkClasses>
         <pattern name="com.badlogic.gdx.**" />
-        <pattern name="land.temmi.trackside.ios.**" />
+        <pattern name="land.temmi.rollercoaster.ios.**" />
     </forceLinkClasses>
 </config>

@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import land.temmi.rollercoaster.asset.ModelDefinition;
 import land.temmi.rollercoaster.asset.ModelManifest;
+import land.temmi.rollercoaster.actor.Facing;
 import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.GravityState;
 import land.temmi.rollercoaster.world.MapProp;
@@ -51,6 +52,21 @@ public final class DistortionMapTest {
         assertStep(GravityState.CEILING, MoveIntent.RIGHT, 1, 0, 0);
     }
 
+    @Test public void directionalFramesTurnWithTheWalkingPlane() {
+        assertEquals(Facing.WEST, DistortionScreen.spriteFacing(GravityState.WEST_WALL, Facing.NORTH));
+        assertEquals(Facing.NORTH, DistortionScreen.spriteFacing(GravityState.WEST_WALL, Facing.EAST));
+        assertEquals(Facing.EAST, DistortionScreen.spriteFacing(GravityState.WEST_WALL, Facing.SOUTH));
+        assertEquals(Facing.SOUTH, DistortionScreen.spriteFacing(GravityState.WEST_WALL, Facing.WEST));
+
+        assertEquals(Facing.EAST, DistortionScreen.spriteFacing(GravityState.EAST_WALL, Facing.NORTH));
+        assertEquals(Facing.SOUTH, DistortionScreen.spriteFacing(GravityState.EAST_WALL, Facing.EAST));
+        assertEquals(Facing.WEST, DistortionScreen.spriteFacing(GravityState.EAST_WALL, Facing.SOUTH));
+        assertEquals(Facing.NORTH, DistortionScreen.spriteFacing(GravityState.EAST_WALL, Facing.WEST));
+
+        assertEquals(Facing.SOUTH, DistortionScreen.spriteFacing(GravityState.CEILING, Facing.NORTH));
+        assertEquals(Facing.WEST, DistortionScreen.spriteFacing(GravityState.CEILING, Facing.EAST));
+    }
+
     /** Walls only ever change altitude; ground and ceiling never do. */
     @Test public void onlyWallsWalkAlongTheVerticalAxis() {
         Vector3 step = new Vector3();
@@ -62,12 +78,13 @@ public final class DistortionMapTest {
         }
     }
 
-    /** Holding one direction per plane has to carry the player the whole way round and back. */
+    /** The authored jump tiles connect the four directional legs into one loop. */
     @Test public void theLoopCanBeWalkedAllTheWayAround() {
         DistortionCave cave = new DistortionCave();
         Vector3 at = cave.spawnTile(new Vector3());
         assertEquals(GravityState.FLOOR, gravity(cave.map, at));
 
+        at = walk(cave.map, at, MoveIntent.UP, 2);
         at = walkUntilThePlaneChanges(cave.map, at, MoveIntent.LEFT);
         assertEquals(GravityState.WEST_WALL, gravity(cave.map, at));
         at = walkUntilThePlaneChanges(cave.map, at, MoveIntent.UP);
@@ -77,8 +94,8 @@ public final class DistortionMapTest {
         at = walkUntilThePlaneChanges(cave.map, at, MoveIntent.DOWN);
         assertEquals(GravityState.FLOOR, gravity(cave.map, at));
 
-        // The loop keeps to the row it started on, so the way back is the row it came from.
-        assertEquals(cave.spawnTile(new Vector3()).z, at.z, 0f);
+        // Every leg joins at the deliberately authored middle tile of its rim.
+        assertEquals(3f, at.z, 0f);
     }
 
     /** A crossing that cannot be walked back would strand the player on a wall. */
@@ -123,9 +140,10 @@ public final class DistortionMapTest {
     @Test public void crossingsArcAwayFromBothPlanes() {
         DistortionCave cave = new DistortionCave();
         Vector3 arc = new Vector3();
-        Vector3 from = cave.spawnTile(new Vector3());
-        Vector3 to = walkUntilThePlaneChanges(cave.map, from, MoveIntent.LEFT);
-        Vector3 before = lastTileBefore(cave.map, cave.spawnTile(new Vector3()), MoveIntent.LEFT);
+        Vector3 before = new Vector3(0, 0, 3);
+        Vector3 to = new Vector3();
+        assertTrue(cave.map.tryStep((int) before.x, (int) before.y, (int) before.z,
+            MoveIntent.LEFT, to));
 
         cave.map.stepArc((int) before.x, (int) before.y, (int) before.z,
             (int) to.x, (int) to.y, (int) to.z, 0.5f, arc);
@@ -135,6 +153,32 @@ public final class DistortionMapTest {
         cave.map.stepArc((int) before.x, (int) before.y, (int) before.z,
             (int) to.x, (int) to.y, (int) to.z, 0f, arc);
         assertEquals("starts flush with the plane", 0f, arc.len(), 1e-5f);
+    }
+
+    @Test public void aRimTileKnowsWhichPlaneItsJumpWillReach() {
+        DistortionCave cave = new DistortionCave();
+        Vector3 rim = new Vector3(0, 0, 3);
+        MapPlane destination = cave.map.crossingDestination(
+            (int) rim.x, (int) rim.y, (int) rim.z, MoveIntent.LEFT);
+        assertNotNull("the rim has no previewable crossing", destination);
+        assertEquals(GravityState.WEST_WALL, destination.gravity);
+    }
+
+    /** A rim stays solid except for one explicitly authored jump in each used direction. */
+    @Test public void eachSurfaceAndDirectionHasOnlyOneJumpTile() {
+        DistortionCave cave = new DistortionCave();
+        Set<String> directions = new HashSet<>();
+        int jumps = 0;
+        for (Vector3 from : allTiles(cave.map)) {
+            MapPlane origin = cave.map.planeAt((int) from.x, (int) from.y, (int) from.z);
+            for (MoveIntent input : INPUTS) {
+                if (cave.map.crossingDestination((int) from.x, (int) from.y, (int) from.z, input) == null) continue;
+                jumps++;
+                assertTrue("more than one jump from " + origin.id + " towards " + input,
+                    directions.add(origin.id + ":" + input));
+            }
+        }
+        assertEquals("one forward and one return jump per surface", 8, jumps);
     }
 
     /** Props are obstacles, but they must not wall off the crossings or the way in and out. */
@@ -162,16 +206,11 @@ public final class DistortionMapTest {
         DistortionCave cave = new DistortionCave();
         Set<String> blocked = blockedTiles(cave.map);
         Vector3 at = cave.spawnTile(new Vector3());
-        MoveIntent[] route = {MoveIntent.LEFT, MoveIntent.UP, MoveIntent.RIGHT, MoveIntent.DOWN};
-        Vector3 target = new Vector3();
-        for (MoveIntent input : route) {
-            MapPlane plane = cave.map.planeAt((int) at.x, (int) at.y, (int) at.z);
-            while (cave.map.tryStep((int) at.x, (int) at.y, (int) at.z, input, target)) {
-                at.set(target);
-                assertTrue("a prop blocks the loop at " + at, !blocked.contains(key(at)));
-                if (cave.map.planeAt((int) at.x, (int) at.y, (int) at.z) != plane) break;
-            }
-        }
+        at = walkClear(cave.map, at, MoveIntent.UP, 2, blocked);
+        at = walkClear(cave.map, at, MoveIntent.LEFT, 5, blocked);
+        at = walkClear(cave.map, at, MoveIntent.UP, 14, blocked);
+        at = walkClear(cave.map, at, MoveIntent.RIGHT, 9, blocked);
+        at = walkClear(cave.map, at, MoveIntent.DOWN, 14, blocked);
         assertEquals(GravityState.FLOOR, gravity(cave.map, at));
     }
 
@@ -210,6 +249,24 @@ public final class DistortionMapTest {
             if (map.planeAt((int) at.x, (int) at.y, (int) at.z) != plane) return at;
         }
         throw new AssertionError("never left the plane walking " + input);
+    }
+
+    private static Vector3 walk(FoldedMap map, Vector3 from, MoveIntent input, int steps) {
+        Vector3 at = new Vector3(from);
+        Vector3 target = new Vector3();
+        for (int step = 0; step < steps; step++) {
+            assertTrue("blocked walking " + input + " from " + at,
+                map.tryStep((int) at.x, (int) at.y, (int) at.z, input, target));
+            at.set(target);
+        }
+        return at;
+    }
+
+    private static Vector3 walkClear(FoldedMap map, Vector3 from, MoveIntent input, int steps,
+                                     Set<String> blocked) {
+        Vector3 at = walk(map, from, input, steps);
+        assertTrue("a prop blocks the loop at " + at, !blocked.contains(key(at)));
+        return at;
     }
 
     private static Vector3 lastTileBefore(FoldedMap map, Vector3 from, MoveIntent input) {

@@ -2,7 +2,6 @@
 gdx = "1.14.2"
 gltf = "2.3.0"
 robovm = "2.3.26"
-kotlin = "2.4.20"
 agp = "9.4.0"
 
 # Launcher modules never ship to iOS, so they may use a modern language level.
@@ -26,5 +25,4 @@ robovm-rt = { module = "com.mobidevelop.robovm:robovm-rt", version.ref = "robovm
 robovm-cocoatouch = { module = "com.mobidevelop.robovm:robovm-cocoatouch", version.ref = "robovm" }
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-app = { id = "com.android.application", version.ref = "agp" }

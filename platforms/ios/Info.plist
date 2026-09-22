@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleDisplayName</key>
-    <string>Trackside Example</string>
+    <string>Rollercoaster Example</string>
     <key>CFBundleExecutable</key>
     <string>example-game</string>
     <key>CFBundleIdentifier</key>
-    <string>land.temmi.trackside.example</string>
+    <string>land.temmi.rollercoaster.example</string>
     <key>CFBundleName</key>
-    <string>Trackside Example</string>
+    <string>Rollercoaster Example</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -32,7 +32,7 @@
                     <key>UISceneConfigurationName</key>
                     <string>Default Configuration</string>
                     <key>UISceneDelegateClassName</key>
-                    <string>land.temmi.trackside.ios.IOSSceneDelegate</string>
+                    <string>land.temmi.rollercoaster.ios.IOSSceneDelegate</string>
                 </dict>
             </array>
         </dict>

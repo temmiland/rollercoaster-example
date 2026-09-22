@@ -23,4 +23,4 @@ Night uses brighter cool ambient light and weak moonlight, so the scene remains 
 their own shadows; see the engine's `docs/lighting.md` for the current render contract.
 
 `./gradlew :lightingSmokeTest --offline` checks measured lighting and saves
-`trackside-day.png` / `trackside-night.png` in the Java temporary directory.
+`rollercoaster-day.png` / `rollercoaster-night.png` in the Java temporary directory.

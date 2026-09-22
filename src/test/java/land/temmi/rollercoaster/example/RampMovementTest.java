@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.MoveIntent;

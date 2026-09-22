@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -28,7 +28,7 @@ public final class WorldSmoke {
     public static void main(String[] args) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setWindowedMode(960, 540);
-        config.setTitle("Trackside distortion cave verification");
+        config.setTitle("Rollercoaster distortion cave verification");
         final Throwable[] failure = {null};
         new Lwjgl3Application(new ApplicationAdapter() {
             private ExampleGame game;
@@ -65,12 +65,15 @@ public final class WorldSmoke {
         shot("01-ground");
         checkPlane(game, GravityState.FLOOR);
 
+        // The cave's first jump is the middle tile on the west rim, not the whole rim.
+        walk(game, MoveIntent.UP, 2);
         walkTo(game, MoveIntent.LEFT, GravityState.WEST_WALL, "02-west-wall");
         walkTo(game, MoveIntent.UP, GravityState.CEILING, "03-ceiling");
         walkTo(game, MoveIntent.RIGHT, GravityState.EAST_WALL, "04-east-wall");
         walkTo(game, MoveIntent.DOWN, GravityState.FLOOR, "05-ground-again");
 
         // A blend has to actually take frames; a snap would make the corner unreadable.
+        walk(game, MoveIntent.LEFT, 8);
         press(game, MoveIntent.LEFT, 1);
         frames(game, 1);
         shot("06-mid-blend");
@@ -97,6 +100,10 @@ public final class WorldSmoke {
         frames(game, 1);
         SCRIPTED[0] = MoveIntent.NONE;
         frames(game, settle);
+    }
+
+    private static void walk(ExampleGame game, MoveIntent input, int steps) throws Exception {
+        for (int step = 0; step < steps; step++) press(game, input, SETTLE_FRAMES);
     }
 
     private static void frames(ExampleGame game, int count) {

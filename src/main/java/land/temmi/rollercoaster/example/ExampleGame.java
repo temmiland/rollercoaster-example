@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;

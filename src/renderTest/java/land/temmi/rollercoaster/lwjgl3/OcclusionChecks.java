@@ -1,4 +1,4 @@
-package land.temmi.trackside.lwjgl3;
+package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -29,7 +29,7 @@ import land.temmi.rollercoaster.render.PixelCamera;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
 import land.temmi.rollercoaster.world.TerrainRules;
 import land.temmi.rollercoaster.world.WorldScene;
-import land.temmi.trackside.example.ExampleMap;
+import land.temmi.rollercoaster.example.ExampleMap;
 
 /** Compares the visible character silhouette with its unobstructed reference in both draw orders. */
 final class OcclusionChecks {

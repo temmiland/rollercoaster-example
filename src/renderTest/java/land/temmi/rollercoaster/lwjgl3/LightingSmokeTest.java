@@ -1,4 +1,4 @@
-package land.temmi.trackside.lwjgl3;
+package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
-import land.temmi.trackside.example.ExampleGame;
+import land.temmi.rollercoaster.example.ExampleGame;
 
 /** Measures lighting in a real GL context and captures both demo lighting states. */
 public final class LightingSmokeTest extends ExampleGame {
@@ -21,10 +21,10 @@ public final class LightingSmokeTest extends ExampleGame {
     @Override public void render() {
         setDemoTime(11f);
         super.render();
-        capture("trackside-day.png");
+        capture("rollercoaster-day.png");
         setDemoTime(22f);
         super.render();
-        capture("trackside-night.png");
+        capture("rollercoaster-night.png");
         LightingChecks.verify();
         if (Gdx.gl.glGetError() != GL20.GL_NO_ERROR) throw new AssertionError("OpenGL error");
         Gdx.app.exit();

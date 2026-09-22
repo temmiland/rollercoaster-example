@@ -8,7 +8,7 @@ java {
 }
 
 application {
-    mainClass = 'land.temmi.trackside.lwjgl3.ExampleLauncher'
+    mainClass = 'land.temmi.rollercoaster.lwjgl3.ExampleLauncher'
 }
 
 dependencies {

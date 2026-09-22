@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.math.Vector3;
 import land.temmi.rollercoaster.render.PlaneCamera;
@@ -73,31 +73,27 @@ public final class PlaneCameraTest {
         assertEquals(-1f, up.dot(ceiling.up(cameraUp)), 1e-3f);
     }
 
-    /** On a wall the sprite lies on its side, because the camera only swings half way onto it. */
-    @Test public void theSpriteLiesOnItsSideOnAWall() {
+    /** Wall gravity uses a clean quarter turn, even though the camera looks at it obliquely. */
+    @Test public void theSpriteUsesQuarterTurnsOnWalls() {
         Vector3 right = new Vector3();
         Vector3 up = new Vector3();
         Vector3 cameraUp = new Vector3();
         Vector3 cameraRight = new Vector3();
         for (GravityState state : new GravityState[] {GravityState.WEST_WALL, GravityState.EAST_WALL}) {
             PlaneCamera camera = snapped(state);
-            camera.spriteBasis(right, up);
+            camera.spriteBasis(state.normal(new Vector3()), right, up);
             camera.up(cameraUp);
             cameraRight.set(camera.direction(new Vector3())).crs(cameraUp).nor();
             assertEquals(state + " is not a quarter turn", 0f, up.dot(cameraUp), 1e-3f);
             assertEquals(state + " is not a quarter turn", 1f, Math.abs(up.dot(cameraRight)), 1e-3f);
         }
-        // The two walls turn opposite ways, so a sprite is never mirrored between them.
-        PlaneCamera west = snapped(GravityState.WEST_WALL);
-        PlaneCamera east = snapped(GravityState.EAST_WALL);
-        west.spriteBasis(right, up);
-        west.up(cameraUp);
-        cameraRight.set(west.direction(new Vector3())).crs(cameraUp).nor();
-        float westTurn = up.dot(cameraRight);
-        east.spriteBasis(right, up);
-        east.up(cameraUp);
-        cameraRight.set(east.direction(new Vector3())).crs(cameraUp).nor();
-        assertTrue("both walls turn the same way", westTurn * up.dot(cameraRight) < 0f);
+    }
+
+    @Test public void sideWallsKeepTheOrdinaryDownwardPitch() {
+        for (GravityState state : new GravityState[] {GravityState.WEST_WALL, GravityState.EAST_WALL}) {
+            assertEquals(state + " lowered the camera to wall level", -0.7071f,
+                snapped(state).direction(new Vector3()).y, 1e-3f);
+        }
     }
 
     @Test public void blendingRunsForItsDurationAndLandsOnTheTarget() {
@@ -119,10 +115,39 @@ public final class PlaneCameraTest {
             .dot(snapped(GravityState.CEILING).direction(new Vector3())), 1e-3f);
     }
 
+    /** Looking over a rim must not turn the sprite before it leaves its current plane. */
+    @Test public void previewingANewPlaneKeepsTheSpriteOnItsCurrentPlane() {
+        PlaneCamera camera = snapped(GravityState.FLOOR);
+        camera.setBlendSeconds(0.2f);
+        camera.blendTo(GravityState.WEST_WALL.normal(new Vector3()), GravityState.WEST_WALL.right(new Vector3()));
+        camera.update(0.1f);
+
+        Vector3 right = new Vector3();
+        Vector3 up = new Vector3();
+        camera.spriteBasis(GravityState.FLOOR.normal(new Vector3()), right, up);
+        Vector3 floorSpriteUp = new Vector3(up);
+
+        camera.spriteBasis(GravityState.WEST_WALL.normal(new Vector3()), right, up);
+        assertTrue("the floor sprite followed the upcoming wall during the preview",
+            up.dot(floorSpriteUp) < 0.999f);
+    }
+
     @Test public void steppingWithinAPlaneDoesNotRestartABlend() {
         PlaneCamera camera = snapped(GravityState.FLOOR);
         camera.blendTo(GravityState.FLOOR.normal(new Vector3()), GravityState.FLOOR.right(new Vector3()));
         assertFalse(camera.isBlending());
+    }
+
+    @Test public void repeatedRimPreviewDoesNotRestartTheCameraBlend() {
+        PlaneCamera camera = snapped(GravityState.FLOOR);
+        camera.setBlendSeconds(0.2f);
+        Vector3 normal = GravityState.WEST_WALL.normal(new Vector3());
+        Vector3 right = GravityState.WEST_WALL.right(new Vector3());
+        camera.blendTo(normal, right);
+        camera.update(0.1f);
+        camera.blendTo(normal, right);
+        camera.update(0.1f);
+        assertFalse("the preview restarted instead of completing", camera.isBlending());
     }
 
     private static PlaneCamera snapped(GravityState state) {

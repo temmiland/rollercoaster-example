@@ -1,8 +1,8 @@
-package land.temmi.trackside.lwjgl3;
+package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import land.temmi.trackside.example.ExampleGame;
+import land.temmi.rollercoaster.example.ExampleGame;
 
 public final class ExampleLauncher {
     private ExampleLauncher() { }

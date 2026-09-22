@@ -1,4 +1,4 @@
-package land.temmi.trackside.lwjgl3;
+package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Array;
 import land.temmi.rollercoaster.render.*;
 import land.temmi.rollercoaster.world.MapProp;
 import land.temmi.rollercoaster.world.WorldScene;
-import land.temmi.trackside.example.ExampleMap;
-import land.temmi.trackside.example.ExampleLighting;
+import land.temmi.rollercoaster.example.ExampleMap;
+import land.temmi.rollercoaster.example.ExampleLighting;
 
 final class LightingChecks {
     static void verify() {

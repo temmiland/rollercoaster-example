@@ -1,4 +1,4 @@
-package land.temmi.trackside.example;
+package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -12,8 +12,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
+import land.temmi.rollercoaster.actor.Facing;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.InputSource;
+import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.render.BillboardRenderer;
 import land.temmi.rollercoaster.render.DirectionalShadowMap;
 import land.temmi.rollercoaster.render.LightingEnvironment;
@@ -50,7 +52,9 @@ final class DistortionScreen implements Disposable {
     private final Array<ModelInstance> noCasters = new Array<>();
     private final Vector3 direction = new Vector3();
     private final Vector3 up = new Vector3();
-    private final Vector3 normal = new Vector3();
+    private final Vector3 cameraNormal = new Vector3();
+    private final Vector3 supportNormal = new Vector3();
+    private final Vector3 fromNormal = new Vector3();
     private final Vector3 planeRight = new Vector3();
     private final Vector3 spriteRight = new Vector3();
     private final Vector3 spriteUp = new Vector3();
@@ -86,24 +90,30 @@ final class DistortionScreen implements Disposable {
         if (finished) return;
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) { finished = true; return; }
 
-        player.update(delta, input.pollMove());
-        if (player.didStep()) applyPlane(false);
+        MoveIntent move = input.pollMove();
+        player.update(delta, move);
+        if (player.didStep()) {
+            applyPlane(false);
+            previewCrossingAtEnteredTile(move);
+        }
+        updateSupportNormal();
         if (!player.isMoving() && onExitTile()) { finished = true; return; }
 
         planeCamera.update(delta);
         planeCamera.direction(direction);
         planeCamera.up(up);
 
-        animation.setFacing(player.getFacing());
+        animation.setFacing(spriteFacing(gravity(), player.getFacing()));
         animation.setMoving(player.isMoving());
         animation.update(Math.max(0f, delta));
         sprite.setRegion(animation.getFrame());
-        planeCamera.spriteBasis(spriteRight, spriteUp);
+        planeCamera.spriteBasis(supportNormal, spriteRight, spriteUp);
         sprite.setBasis(spriteRight, spriteUp);
-        sprite.setDepthUp(normal);
+        sprite.setDepthUp(supportNormal);
         sprite.setPosition(player.getPosition());
 
-        camera.follow(player.getPosition(), TileMap.LEVEL_HEIGHT, TERRAIN_LEVEL_PIXEL_HEIGHT, direction, up);
+        camera.follow(player.getPosition(), TileMap.LEVEL_HEIGHT, TERRAIN_LEVEL_PIXEL_HEIGHT,
+            direction, up, spriteUp);
         camera.snapToPixelGrid(target.getWidth(), target.getHeight());
 
         applyCaveLighting();
@@ -119,14 +129,83 @@ final class DistortionScreen implements Disposable {
         target.blitToScreen(blit);
     }
 
-    /** Points the camera at the plane the player now stands on. */
+    /** Points the camera at the plane the player has entered. */
     private void applyPlane(boolean snap) {
         MapPlane plane = cave.map.planeAt(player.getTileX(), player.getTileY(), player.getTileZ());
         if (plane == null) return;
-        plane.gravity.normal(normal);
+        plane.gravity.normal(cameraNormal);
+        if (snap) supportNormal.set(cameraNormal);
         plane.gravity.right(planeRight);
-        if (snap) planeCamera.snapTo(normal, planeRight);
-        else planeCamera.blendTo(normal, planeRight);
+        if (snap) planeCamera.snapTo(cameraNormal, planeRight);
+        else planeCamera.blendTo(cameraNormal, planeRight);
+    }
+
+    /** The sprite turns over the arc of a real crossing, rather than when its view first previews it. */
+    private void updateSupportNormal() {
+        MapPlane destination = cave.map.planeAt(player.getTileX(), player.getTileY(), player.getTileZ());
+        if (destination == null) return;
+        MapPlane origin = cave.map.planeAt(player.getFromTileX(), player.getFromTileY(), player.getFromTileZ());
+        if (player.isMoving() && origin != null && origin != destination) {
+            origin.gravity.normal(fromNormal);
+            destination.gravity.normal(supportNormal);
+            supportNormal.set(fromNormal).lerp(supportNormal, player.getStepProgress()).nor();
+            return;
+        }
+        destination.gravity.normal(supportNormal);
+    }
+
+    /**
+     * Previews a jump only while entering its source tile in that jump's direction. The reverse
+     * crossing at the landing tile therefore remains quiet until the player deliberately returns.
+     */
+    private void previewCrossingAtEnteredTile(MoveIntent move) {
+        MapPlane destination = cave.map.crossingDestination(
+            player.getTileX(), player.getTileY(), player.getTileZ(), move);
+        if (destination == null) return;
+        destination.gravity.normal(cameraNormal);
+        destination.gravity.right(planeRight);
+        planeCamera.blendTo(cameraNormal, planeRight);
+    }
+
+    /**
+     * Directional frames remain tied to the character after its quarter-turn with a walking
+     * plane. The west wall, for example, turns the north-facing image onto screen-left.
+     */
+    static Facing spriteFacing(GravityState gravity, Facing facing) {
+        if (gravity == null || facing == null) return facing;
+        switch (gravity) {
+            case WEST_WALL: return turnLeft(facing);
+            case EAST_WALL: return turnRight(facing);
+            case CEILING: return turnAround(facing);
+            default: return facing;
+        }
+    }
+
+    private static Facing turnLeft(Facing facing) {
+        switch (facing) {
+            case NORTH: return Facing.WEST;
+            case WEST: return Facing.SOUTH;
+            case SOUTH: return Facing.EAST;
+            default: return Facing.NORTH;
+        }
+    }
+
+    private static Facing turnRight(Facing facing) {
+        switch (facing) {
+            case NORTH: return Facing.EAST;
+            case EAST: return Facing.SOUTH;
+            case SOUTH: return Facing.WEST;
+            default: return Facing.NORTH;
+        }
+    }
+
+    private static Facing turnAround(Facing facing) {
+        switch (facing) {
+            case NORTH: return Facing.SOUTH;
+            case SOUTH: return Facing.NORTH;
+            case EAST: return Facing.WEST;
+            default: return Facing.EAST;
+        }
     }
 
     private boolean onExitTile() {

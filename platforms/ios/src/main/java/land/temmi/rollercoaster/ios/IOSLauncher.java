@@ -1,11 +1,13 @@
-package land.temmi.trackside.ios;
+package land.temmi.rollercoaster.ios;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import land.temmi.trackside.example.ExampleGame;
+import land.temmi.rollercoaster.example.ExampleGame;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
+import org.robovm.rt.bro.annotation.ForceLinkClass;
 
+@ForceLinkClass(IOSSceneDelegate.class)
 public final class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {

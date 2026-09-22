@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'land.temmi.trackside.android'
+    namespace 'land.temmi.rollercoaster.android'
     compileSdk 36
 
     defaultConfig {
-        applicationId 'land.temmi.trackside.example'
+        applicationId 'land.temmi.rollercoaster.example'
         minSdk 23
         targetSdk 36
         versionCode 1

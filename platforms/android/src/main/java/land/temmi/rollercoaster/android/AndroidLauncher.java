@@ -1,9 +1,9 @@
-package land.temmi.trackside.android;
+package land.temmi.rollercoaster.android;
 
 import android.os.Bundle;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import land.temmi.trackside.example.ExampleGame;
+import land.temmi.rollercoaster.example.ExampleGame;
 
 public final class AndroidLauncher extends AndroidApplication {
     @Override

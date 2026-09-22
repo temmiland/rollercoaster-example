@@ -1,4 +1,4 @@
-package land.temmi.trackside.lwjgl3;
+package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import land.temmi.trackside.example.ExampleGame;
+import land.temmi.rollercoaster.example.ExampleGame;
 import land.temmi.rollercoaster.render.WorldShaderProvider;
 import land.temmi.rollercoaster.actor.DirectionalSpriteAnimation;
 import land.temmi.rollercoaster.actor.Facing;
@@ -29,7 +29,7 @@ import land.temmi.rollercoaster.asset.ModelDefinition;
 import land.temmi.rollercoaster.asset.SpriteAtlas;
 import land.temmi.rollercoaster.asset.SpriteDefinition;
 import land.temmi.rollercoaster.asset.SpriteManifest;
-import land.temmi.trackside.example.ExampleMap;
+import land.temmi.rollercoaster.example.ExampleMap;
 import land.temmi.rollercoaster.actor.GridActor;
 import land.temmi.rollercoaster.input.MoveIntent;
 import land.temmi.rollercoaster.world.MapLoader;
@@ -44,7 +44,7 @@ import land.temmi.rollercoaster.world.Tileset;
 public final class RenderSmokeTest extends ExampleGame {
     public static void main(String[] args) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setTitle("Trackside render verification");
+        config.setTitle("Rollercoaster render verification");
         config.setWindowedMode(960, 540);
         config.disableAudio(true);
         new Lwjgl3Application(new RenderSmokeTest(), config);
@@ -56,7 +56,7 @@ public final class RenderSmokeTest extends ExampleGame {
         Pixmap screenshot = Pixmap.createFromFrameBuffer(0, 0,
             Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
         try {
-            PixmapIO.writePNG(Gdx.files.absolute(System.getProperty("java.io.tmpdir") + "/trackside-step6.png"),
+            PixmapIO.writePNG(Gdx.files.absolute(System.getProperty("java.io.tmpdir") + "/rollercoaster-step6.png"),
                 screenshot, -1, true);
         } finally {
             screenshot.dispose();
