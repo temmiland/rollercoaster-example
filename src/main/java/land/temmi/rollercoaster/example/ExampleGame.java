@@ -1,5 +1,6 @@
 package land.temmi.rollercoaster.example;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -34,6 +35,7 @@ import land.temmi.rollercoaster.input.InputSource;
 import land.temmi.rollercoaster.input.CombinedInput;
 import land.temmi.rollercoaster.input.KeyboardInput;
 import land.temmi.rollercoaster.input.TouchInput;
+import land.temmi.rollercoaster.input.TouchpadRenderer;
 
 public class ExampleGame extends ApplicationAdapter {
 
@@ -66,6 +68,7 @@ public class ExampleGame extends ApplicationAdapter {
     private DistortionScreen distortion;
     private final Vector3 caveTile = new Vector3();
     private int debugFrames;
+    private TouchpadRenderer touchpadRenderer;
 
     @Override
     public void create() {
@@ -94,7 +97,14 @@ public class ExampleGame extends ApplicationAdapter {
         caveTile.set(caveEntity.x, 0f, caveEntity.z);
         player.setTileAccess(new TerrainRules(map.tiles));
         player.setTile(playerEntity.x, playerEntity.z);
-        input = new CombinedInput(new KeyboardInput(), new TouchInput());
+        TouchInput touchInput = new TouchInput();
+        input = new CombinedInput(new KeyboardInput(), touchInput);
+        // Only mobile players touch the screen to move; drawing it on desktop would just be
+        // visual noise over a keyboard-driven game.
+        Application.ApplicationType platform = Gdx.app.getType();
+        if (platform == Application.ApplicationType.Android || platform == Application.ApplicationType.iOS) {
+            touchpadRenderer = new TouchpadRenderer(touchInput);
+        }
     }
 
     private void createPlayerSprite() {
@@ -128,6 +138,7 @@ public class ExampleGame extends ApplicationAdapter {
         }
         if (distortion != null) {
             distortion.render(delta);
+            if (touchpadRenderer != null) touchpadRenderer.render();
             if (distortion.isFinished()) {
                 distortion.dispose();
                 distortion = null;
@@ -183,6 +194,7 @@ public class ExampleGame extends ApplicationAdapter {
         lowRes.end();
 
         lowRes.blitToScreen(blitBatch);
+        if (touchpadRenderer != null) touchpadRenderer.render();
     }
 
     protected void setDemoTime(float hours) {
@@ -214,6 +226,7 @@ public class ExampleGame extends ApplicationAdapter {
     @Override
     public void dispose() {
         if (distortion != null) distortion.dispose();
+        if (touchpadRenderer != null) touchpadRenderer.dispose();
         lowRes.dispose();
         blitBatch.dispose();
         shapes.dispose();
