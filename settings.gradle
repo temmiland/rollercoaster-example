@@ -19,9 +19,11 @@ rootProject.name = 'example-game'
 include 'platforms:desktop'
 include 'platforms:android'
 include 'platforms:ios'
+include 'platforms:web'
 
 project(':platforms:desktop').projectDir = file('platforms/desktop')
 project(':platforms:android').projectDir = file('platforms/android')
 project(':platforms:ios').projectDir = file('platforms/ios')
+project(':platforms:web').projectDir = file('platforms/web')
 
 includeBuild('../rollercoaster')

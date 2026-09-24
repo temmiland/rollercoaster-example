@@ -9,9 +9,12 @@ The build uses the sibling Rollercoaster repository through `includeBuild('../ro
 ./gradlew build
 ./gradlew :renderSmokeTest
 ./gradlew :platforms:desktop:run
+./gradlew :platforms:web:gdx_teavm_web_js_run
 ```
 
-Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android` und `platforms/ios`.
+Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android`, `platforms/ios` und
+`platforms/web`. Die Web-Plattform übersetzt das Spiel mit gdx-teavm nach JavaScript und rendert
+über WebGL 2; der Run-Task startet einen lokalen Server auf Port 8080.
 
 Die Laufzeit lädt die Welt über `WorldSceneLoader` und kombiniert Tastatursteuerung mit dem
 virtuellen D-Pad der `TouchInput`-Zone unten links. Das Gamepad-Adapter-API der Engine kann von

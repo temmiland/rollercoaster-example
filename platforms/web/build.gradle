@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'com.github.xpenatan.gdx-teavm' version '1.6.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+dependencies {
+    implementation project(':')
+}
+
+gdxTeaVM {
+    classpathAssets('maps', 'models', 'sprites', 'land/temmi/rollercoaster/render')
+
+    webDefaults {
+        mainClass = 'land.temmi.rollercoaster.web.WebLauncher'
+        htmlTitle = 'example-game'
+        obfuscated = false
+    }
+
+    js {}
+}
