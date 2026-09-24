@@ -10,7 +10,7 @@ größere oder kleinere NPC-Sprites verändern daher weder Zoom noch sichtbaren 
 ```json
 {
   "version": 1,
-  "atlas": "sprites/player.atlas",
+  "atlas": "player.atlas",
   "sprites": [{
     "id": "player",
     "height": 1,

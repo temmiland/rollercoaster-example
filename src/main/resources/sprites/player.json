@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "atlas": "sprites/player.atlas",
+  "atlas": "player.atlas",
   "sprites": [
     {
       "id": "player",

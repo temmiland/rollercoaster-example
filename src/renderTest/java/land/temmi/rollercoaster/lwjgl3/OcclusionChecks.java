@@ -1,6 +1,7 @@
 package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -36,9 +37,10 @@ final class OcclusionChecks {
     private enum Visibility { FULL, PARTIAL, HIDDEN }
 
     private final WorldScene scene = ExampleMap.createScene();
-    private final SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
+    private final FileHandle manifestFile = Gdx.files.classpath("sprites/player.json");
+    private final SpriteManifest manifest = SpriteManifest.load(manifestFile);
     private final SpriteDefinition definition = manifest.sprite("player");
-    private final SpriteAtlas atlas = new SpriteAtlas(manifest.atlas);
+    private final SpriteAtlas atlas = SpriteAtlas.load(manifestFile, manifest);
     private final DirectionalSpriteAnimation animation = new DirectionalSpriteAnimation(atlas, definition);
     private final BillboardQuad quad = new BillboardQuad();
     private final BillboardRenderer sprite = new BillboardRenderer(quad, atlas.getTexture(), animation.getFrame(), definition.worldHeight);

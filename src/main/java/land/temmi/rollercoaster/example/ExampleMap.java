@@ -2,9 +2,7 @@ package land.temmi.rollercoaster.example;
 
 import com.badlogic.gdx.Gdx;
 import land.temmi.rollercoaster.asset.ModelCatalog;
-import land.temmi.rollercoaster.asset.ModelDefinition;
 import land.temmi.rollercoaster.asset.ModelManifest;
-import land.temmi.rollercoaster.asset.GltfModelFactory;
 import land.temmi.rollercoaster.world.LoadedMap;
 import land.temmi.rollercoaster.world.TextureTileset;
 import land.temmi.rollercoaster.world.WorldScene;
@@ -39,14 +37,7 @@ public final class ExampleMap {
 
     public static ModelCatalog getModelCatalog() {
         if (modelCatalog == null) {
-            modelCatalog = new ModelCatalog();
-            for (ModelDefinition definition : ModelManifest.load(Gdx.files.classpath("maps/models.json"))) {
-                if (definition.source.startsWith("gltf:") || definition.source.startsWith("glb:")) {
-                    modelCatalog.register(definition, new GltfModelFactory(definition));
-                } else {
-                    throw new IllegalArgumentException("Unknown model source: " + definition.source);
-                }
-            }
+            modelCatalog = ModelCatalog.load(Gdx.files.classpath("models/models.json"));
         }
         return modelCatalog;
     }

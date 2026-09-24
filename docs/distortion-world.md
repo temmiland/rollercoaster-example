@@ -17,7 +17,7 @@ Karte mit Tiles, Props und Entities, dazu ihre Schwerkraft und das Raster-Tile, 
 lädt das Dokument und liefert das Tileset; Bewegung, Kollision, Geometrie und Kamera kommen aus der
 Bibliothek (siehe `docs/folded-maps.md` in `rollercoaster`).
 
-Felsen und Kristalle sind echte Props aus `maps/models.json` und blockieren ihr Feld — auf der
+Felsen und Kristalle sind echte Props aus `models/models.json` und blockieren ihr Feld — auf der
 Decke hängen sie nach unten, an den Wänden stehen sie seitlich ab. Auch der Höhleneingang in der
 Testmap ist ein Prop (`caveArch` plus zwei `cavePillar`); seine Kollision kommt aus dem
 Modell-Manifest, nicht aus handgesetzten Feldern.

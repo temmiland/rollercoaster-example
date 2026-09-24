@@ -3,7 +3,7 @@
   "models": [
     {
       "id": "house",
-      "source": "gltf:models/house.gltf",
+      "source": "gltf:house.gltf",
       "anchor": [-0.5, 0, -0.5],
       "scale": 1,
       "height": 4,
@@ -12,7 +12,7 @@
     },
     {
       "id": "streetLamp",
-      "source": "gltf:models/street-lamp.gltf",
+      "source": "gltf:street-lamp.gltf",
       "anchor": [0, 0, 0],
       "scale": 1,
       "height": 2.9,
@@ -21,7 +21,7 @@
     },
     {
       "id": "suspensionBridge",
-      "source": "gltf:models/suspension-bridge.gltf",
+      "source": "gltf:suspension-bridge.gltf",
       "anchor": [0, -0.12, 0],
       "scale": 1,
       "height": 3.04,
@@ -32,7 +32,7 @@
     },
     {
       "id": "caveArch",
-      "source": "gltf:models/cave-arch.gltf",
+      "source": "gltf:cave-arch.gltf",
       "anchor": [0, 0, 0],
       "scale": 1,
       "height": 2.4,
@@ -41,7 +41,7 @@
     },
     {
       "id": "cavePillar",
-      "source": "gltf:models/cave-pillar.gltf",
+      "source": "gltf:cave-pillar.gltf",
       "anchor": [0, 0, 0],
       "scale": 1,
       "height": 1.85,
@@ -50,7 +50,7 @@
     },
     {
       "id": "caveRock",
-      "source": "gltf:models/cave-rock.gltf",
+      "source": "gltf:cave-rock.gltf",
       "anchor": [0, 0, 0],
       "scale": 1,
       "height": 0.4,
@@ -59,7 +59,7 @@
     },
     {
       "id": "caveCrystal",
-      "source": "gltf:models/cave-crystal.gltf",
+      "source": "gltf:cave-crystal.gltf",
       "anchor": [0, 0, 0],
       "scale": 1,
       "height": 1.24,

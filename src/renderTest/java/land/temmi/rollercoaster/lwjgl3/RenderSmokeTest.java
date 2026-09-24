@@ -1,6 +1,7 @@
 package land.temmi.rollercoaster.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
@@ -74,13 +75,14 @@ public final class RenderSmokeTest extends ExampleGame {
     }
 
     private void verifySprites() {
-        SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
+        FileHandle manifestFile = Gdx.files.classpath("sprites/player.json");
+        SpriteManifest manifest = SpriteManifest.load(manifestFile);
         SpriteDefinition definition = manifest.sprite("player");
-        if (!"sprites/player.atlas".equals(manifest.atlas)
+        if (!"player.atlas".equals(manifest.atlas)
             || definition.worldHeight != 1f || definition.frameDuration != 0.14f) {
             throw new AssertionError("Sprite manifest metadata did not load");
         }
-        SpriteAtlas atlas = new SpriteAtlas(manifest.atlas);
+        SpriteAtlas atlas = SpriteAtlas.load(manifestFile, manifest);
         try {
             DirectionalSpriteAnimation animation = new DirectionalSpriteAnimation(atlas, definition);
             int previousX = -1;
@@ -310,7 +312,7 @@ public final class RenderSmokeTest extends ExampleGame {
             }
             if (blocked != 27) throw new AssertionError("Expected all model footprints, got " + blocked);
             ModelDefinition house = ExampleMap.getModelCatalog().definition("house");
-            if (!"gltf:models/house.gltf".equals(house.source)
+            if (!"gltf:house.gltf".equals(house.source)
                 || house.offsetX != -0.5f || house.offsetY != 0f || house.offsetZ != -0.5f
                 || house.scale != 1f || house.height != 4f
                 || house.boundsMinX != -1.8f || house.boundsMinY != 0f || house.boundsMinZ != -1.3f
@@ -320,7 +322,7 @@ public final class RenderSmokeTest extends ExampleGame {
                 throw new AssertionError("Model manifest did not load house metadata");
             }
             ModelDefinition lamp = ExampleMap.getModelCatalog().definition("streetLamp");
-            if (!"gltf:models/street-lamp.gltf".equals(lamp.source)
+            if (!"gltf:street-lamp.gltf".equals(lamp.source)
                 || lamp.offsetX != 0f || lamp.offsetY != 0f || lamp.offsetZ != 0f
                 || lamp.scale != 1f || lamp.height != 2.9f
                 || lamp.boundsMinX != -0.2f || lamp.boundsMinY != 0f || lamp.boundsMinZ != -0.2f
@@ -330,7 +332,7 @@ public final class RenderSmokeTest extends ExampleGame {
                 throw new AssertionError("Model manifest did not load street lamp metadata");
             }
             ModelDefinition bridge = ExampleMap.getModelCatalog().definition("suspensionBridge");
-            if (!"gltf:models/suspension-bridge.gltf".equals(bridge.source)
+            if (!"gltf:suspension-bridge.gltf".equals(bridge.source)
                 || bridge.offsetX != 0f || bridge.offsetY != -0.12f || bridge.offsetZ != 0f
                 || bridge.scale != 1f || bridge.height != 3.04f
                 || bridge.boundsMinX != -3.5f || bridge.boundsMinY != 0f || bridge.boundsMinZ != -0.45f

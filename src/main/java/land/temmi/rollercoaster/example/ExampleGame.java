@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -108,8 +109,9 @@ public class ExampleGame extends ApplicationAdapter {
     }
 
     private void createPlayerSprite() {
-        SpriteManifest manifest = SpriteManifest.load(Gdx.files.classpath("sprites/player.json"));
-        playerAtlas = new SpriteAtlas(manifest.atlas);
+        FileHandle manifestFile = Gdx.files.classpath("sprites/player.json");
+        SpriteManifest manifest = SpriteManifest.load(manifestFile);
+        playerAtlas = SpriteAtlas.load(manifestFile, manifest);
         playerDefinition = manifest.sprite("player");
         playerAnimation = new DirectionalSpriteAnimation(playerAtlas, playerDefinition);
         subjectWorldHeight = playerDefinition.worldHeight;

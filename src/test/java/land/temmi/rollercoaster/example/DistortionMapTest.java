@@ -216,7 +216,7 @@ public final class DistortionMapTest {
 
     /** World tiles covered by a prop's footprint, which the scene turns into collision. */
     private static Set<String> blockedTiles(FoldedMap map) {
-        Array<ModelDefinition> models = ModelManifest.load(Gdx.files.classpath("maps/models.json"));
+        Array<ModelDefinition> models = ModelManifest.load(Gdx.files.classpath("models/models.json"));
         Set<String> blocked = new HashSet<>();
         Vector3 tile = new Vector3();
         for (MapPlane plane : map.planes()) {
