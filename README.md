@@ -9,7 +9,7 @@ The build uses the sibling Rollercoaster repository through `includeBuild('../ro
 ./gradlew build
 ./gradlew :renderSmokeTest
 ./gradlew :platforms:desktop:run
-./gradlew :platforms:web:gdx_teavm_web_js_run
+./gradlew :platforms:web:run
 ```
 
 Die Plattform-Launcher liegen unter `platforms/desktop`, `platforms/android`, `platforms/ios` und

@@ -23,3 +23,9 @@ gdxTeaVM {
 
     js {}
 }
+
+tasks.register('run') {
+    group = 'application'
+    description = 'Builds the web app and serves it on http://localhost:8080.'
+    dependsOn 'gdx_teavm_web_js_run'
+}
